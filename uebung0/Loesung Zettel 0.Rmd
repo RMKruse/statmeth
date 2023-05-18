@@ -2,19 +2,14 @@
 title: "Lösung Zettel 0"
 output:
   html_document: default
-  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Lösung zu Übungszettel 0
-
-
 ### Aufgabe 1
 
-#### a)
 Was haben wir?
 
 Die PRIOR Wahrscheinlichkeit, dass eine Person krank ist
@@ -83,6 +78,17 @@ $$
 ### Aufgabe 2
 
 Berechne anhand einer Normalverteilung mit Mittelwert 500 und Standardabweichung 100 mit der Funktion \texttt{pnorm} die Wahrscheinlichkeit, Werte zwischen 200 und 800 aus dieser Verteilung zu erhalten
+
+
+```{r, echo=FALSE}
+
+curve(dnorm(x, 500, 100), from=0, to=1000, xlab = c(""), ylab = c(""))
+abline(v = 200, col = "darkblue", lwd = 4)
+abline(v = 800, col = "darkblue", lwd = 4)
+
+```
+
+
 
 ```{r}
 

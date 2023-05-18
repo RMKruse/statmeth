@@ -1,0 +1,207 @@
+---
+title: "Lösung Zettel 1"
+output: html_document
+date: "2023-05-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Aufgabe 1
+
+
+Welche Ereignisse was wir haben:
+
+ - Würfel A, zeigt mit 10% eine 6.
+ - Würfel B, C, zeigen mit 20% eine 6.
+ - Würfel D, E, F zeigen mit 30% eine 6.
+ 
+ 
+Was beobachten wir?
+
+ - Wir sehen, dass der Würfel nach zwei Würfen zwei Mal eine 6 ergibt.
+ - Wir haben also ein Experiment mit Erfolg (Augenzahl 6) oder Misserfolg (alles andere).
+ - Wir haben zwei Durchläufe.
+ - Es handelt sich also um ein klassisches Binomial Experiment
+
+
+Aufschreiben was wir haben:
+
+ - Wir beobachten zwei Erfolge hintereinander mit unbekannter Erfolgswahrscheinlichkeit ($\theta$):
+
+$$
+  y | \theta \sim Bin(2, \theta)
+$$
+
+Würfen haben Wahrscheinlichkeiten, 
+
+ - Würfel A Wahrscheinlichkeit für eine 6 $\theta = 0.1$ mit einer Wahrscheinlichkeit fürs Auftreten mit $f(\theta) = 1/6$
+ - Würfel B,C Wahrscheinlichkeit für eine 6 $\theta = 0.2$ mit einer Wahrscheinlichkeit fürs Auftreten mit $f(\theta) = 2/6$
+ - Würfel D,E,F Wahrscheinlichkeit für eine 6 $\theta = 0.3$ mit einer Wahrscheinlichkeit fürs Auftreten mit $f(\theta) = 3/6$
+
+
+Was wollen wir wissen? 
+
+ - Wie ist die Wahrscheinlichkeit, dass eine 6 gewürfelt wird.
+ $$
+  f(\theta | x) = \dfrac{f(\theta) f(y | \theta)}{f(y)}
+ $$
+ -  Wir müssen also zum Lösen $f(y|\theta)$ und $f(y)$ berechnen
+
+---
+
+1. Schritt: Alles zusammenführen, berechnen $f(y|\theta)$
+
+Wir beobachten also zweimal eine 6, wenn wir das in die Binomial-Verteilung einsetzten erhalten wir:
+$$
+  f(y | \theta) = \binom{2}{x} \theta^{x} (1 - \theta)^{2- x} = \binom{2}{2} \theta^{2} (1 - \theta)^{2- 2}
+$$
+Jetzt können wir das ganze einfach in R eingeben und jeweils für die verschiedenen $\theta$ der Würfel ausrechnen
+
+```{r}
+# Würfel A
+dbinom(2, 2, prob = 0.1)
+# Würfel B,C
+dbinom(2, 2, prob = 0.2)
+# Würfel D,E,F
+dbinom(2, 2, prob = 0.3)
+```
+
+
+Oder wir erinnern uns an Exponenten-Regeln aus der Mathematik
+$$
+  f(y | \theta) = \binom{2}{2} \theta^{2} (1 - \theta)^{2- 2} = \binom{2}{2} \theta^{2} (1 - \theta)^{0} = (1) \theta ^{2} (1) = \theta^2
+$$
+
+Alternativ, wissen wir dass zwei Würfel würfe nacheinander vollkommen unabhängig sind und somit die Wahrscheinlichkeit, für zweier Würfe ist das Produkt der einzelnen, also
+$$
+  \theta_{\text{wurf } 1} \text{ und } \theta_{\text{wurf } 2} = \theta_{\text{wurf } 1} \times \theta_{\text{wurf } 2}
+$$
+
+---
+
+2. Schritt: $f(y)$ berechnen
+
+Wir wissen, dass die Wahrscheinlichkeit für $f(y)$ gegeben ist als
+$$
+ f(y) = \sum_{\theta} f(\theta) f(y | \theta) \\ = \dfrac{1}{6} \theta_{A}^2 + \dfrac{2}{6} \theta_{B,C}^2 + \dfrac{3}{6} \theta_{D,E,F}^2 \\ 
+=  \dfrac{1}{6} (0.1)^2 + \dfrac{2}{6} (0.2)^2 + \dfrac{3}{6} (0.3)^2 \\
+= 0.06
+$$
+
+---
+
+3. Schritt: Alles einsetzen und $f(\theta | x)$ ausrechnen
+
+*Hinweis:*:Wir müssen es für jede Würfel Gruppe machen!
+
+$$
+  f(\theta | x) = \dfrac{f(\theta) f(y | \theta)}{f(y)} 
+$$
+Würfel A
+$$
+f(\theta_{A} | x) = \dfrac{f(\theta_{A}) f(y | \theta_{A})}{f(y)} \\
+  = \dfrac{(1/6) \cdot (0.1)^2}{ 0.06} = 0.02778 \\
+$$
+Würfel B,C
+$$
+f(\theta_{B,C} | x) = \dfrac{f(\theta_{B,C}) f(y | \theta_{B,C})}{f(y)} \\
+  = \dfrac{(2/6) \cdot (0.2)^2}{ 0.06} = 0.222\bar{2} \\
+$$
+Würfel D,E,F
+$$
+f(\theta_{D,E,F} | x) = \dfrac{f(\theta_{D,E,F}) f(y | \theta_{D,E,F})}{f(y)} \\
+  = \dfrac{(3/6) \cdot (0.3)^2}{ 0.06} = 0.75 \\
+$$
+
+---
+
+### Aufgabe 2
+
+#### a-b)
+
+Aufschreiben was wir haben an Ereignissen, wir haben drei Gruppe $A,B,C$ und die möglichkeit krank zu sein $K$
+
+ - Ereignis $A$: Person in Gruppe A, 
+    - Auftrittswahrscheinlichkeit $P(A) = 0.1$, 
+    - Krankheitswahrscheinlichkeit, gegeben in Gruppe A zu sein ist $P(K | A) = 0.02$
+  
+ - Ereignis $B$: Person in Gruppe B, 
+    - Auftrittswahrscheinlichkeit $P(B) = 0.3$, 
+    - Krankheitswahrscheinlichkeit, gegeben in Gruppe B zu sein ist $P(K | B) = 0.04$
+  
+ - Ereignis $C$: Person in Gruppe C, 
+    - Auftrittswahrscheinlichkeit $P(C) = 0.6$, 
+    - Krankheitswahrscheinlichkeit, gegeben in Gruppe C zu sein ist $P(K | C) = 0.03$
+
+
+#### c)
+
+Marginale Wahrscheinlichkeit für krank sein $P(K)$.
+
+*Hinweis:* Wir summieren einfach die Wahrscheinlichkeiten auf dafür Krank zu sein ($K$) und gleichzeit in einer der drei Gruppen zu sein ($A, B, C$). 
+
+$$
+  P(K) = P(A \cap K) + P(B \cap K) + P(C \cap K)
+$$
+Allerdings haben wir $P(A \cap K)$ und die anderen Gruppen nicht, wir wissen aber, dass wir diesen Ausdruck umschreiben können als: $ P(A \cap K) = P(A) P(K|A)$. Diese Werte haben wir, sodass wir $P(K)$ durch einsetzten errechnen können über
+$$
+  P(K) = P(A \cap K) + P(B \cap K) + P(C \cap K) \\
+       = P(A) P(K|A) + P(B) P(K|B) + P(C) P(K|C) \\
+       = 0.1 \times 0.02 + 0.3 \times 0.04 + 0.6 \times 0.03 \\
+       = 0.032
+$$
+
+#### d)
+Wir wissen nun also wie hoch die Wahrscheinlichkeit ist für eine Person krank zu sein. Jetzt wollen wir wissen, wie hoch die Wahrscheinlichkeit ist, dass diese auch noch in Gruppe C ist. Wir wollen also die bedingte (conditional) Wahrscheinlichkeit haben
+
+$$
+  P(C | K) = \dfrac{P(C \cap K)}{P(K)} = \dfrac{0.018}{0.032} = \dfrac{9}{16}
+$$
+
+---
+
+### Aufgabe 3
+
+
+#### a)
+
+```{r}
+set.seed(42)
+hist(rpois(n=20, lambda = 4))
+```
+
+
+#### b)
+hier gibt es eine richtige Antwort.
+Beispiel:
+
+ - Gleichverteilung (Uniform Distirbution), da wir sehr wenige Beobachtungen haben und nicht wirklich gute Aussagen machen können über die Verteilung. Wir können nur sehen, dass es sich um ganze Zahlen (diskret) handelt, welche nur positiv werden können. Eine logische Beschränkung des Priors wäre somit auf eine untere Grenze von $0$. 
+ - Alternativen: Gamma Prior und andere möglich, hier kommt es auf eure Argumentation an!
+ 
+#### c)  
+ 
+Wir wissen aus der vorigen Aufgabe, dass ein Mean von $3$ und eine Varianz von $1.5$ angenommen wird. Jetzt haben wir gegeben, dass der Mean der Gamma $a/b$ und die Varianz $a/b^2$ entsprechen. Wir müssen also die beide Gleichungen gleichsetzen und ausrechnen
+
+$$
+  a/b = 3 \text{  und  } a/b^2 = 1.5, \text{  umformen:  } \\
+  b = a/3 \text{  und  } a = 1.5b^2, \text{  einsetzen:  } \\
+  a = 6 \text{  und  } b = 2
+$$
+
+#### d)
+
+*Hinweis:* Proportional bedeutet, die vereinfachte ohne die margine Likelihood.
+
+$$
+  Posterior \propto Likelihood \times Prior = Poisson \times Gamma \\
+  = \left[ \dfrac{exp(-n \lambda) \lambda^{\sum_{i}^{n} x_i}}{\prod_{i=1}^{n} x_{i} !}  \right] \times \left[ \dfrac{b^{a} \lambda^{a - 1} exp(-b \lambda)}{\Gamma(a)}  \right]
+$$
+#### e - f)
+
+
+
+
+
+

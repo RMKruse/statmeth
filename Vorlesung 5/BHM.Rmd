@@ -1,0 +1,262 @@
+---
+title: "R-Beispiel 6: Bayesianische hierarchische Modelle"
+output: html_document
+date: "2023-05-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+set.seed(42)
+library(dplyr)
+library(bcogsci)
+library(ggplot2)
+library(brms)
+```
+
+
+## Daten
+
+Daten einlesen und die erklärende Variable `cloze` mittelwertzentrieren.
+
+```{r, cache=TRUE}
+data("df_eeg")
+(df_eeg <- df_eeg %>%
+    mutate(c_cloze = cloze - mean(cloze)))
+```
+
+```{r, echo=FALSE}
+df_eeg %>% ggplot(aes(n400)) +
+  geom_histogram(
+    binwidth = 4,
+    alpha = .5,
+    aes(y = after_stat(density))
+  ) +
+  stat_function(fun = dnorm, args = list(
+    mean = mean(df_eeg$n400),
+    sd = sd(df_eeg$n400)
+  ))
+```
+
+
+## Complete Pooling Model
+
+Dieses Modell geht von den folgenden Annahmen aus.
+
+- Die EEG-Mittelwerte für das raumzeitliche N400-Fenster sind normalverteilt.
+- Die Beobachtungen sind unabhängig.
+- Es besteht eine lineare Beziehung zwischen Lückentext und dem EEG-Signal für den Versuch.
+
+Eine normalverteilte Response scheint hier gegeben zu sein, das Modell wird daher wie folgt aussehen
+
+\begin{equation}
+   signal \sim \mathit{Normal}( \alpha + c\_cloze \cdot \beta,\sigma).
+\end{equation}
+
+Wie immer müssen wir uns auf unser Vorwissen und unsere Fachkenntnisse stützen, um die Prioritäten zu bestimmen!
+
+Graphen, summaries oder einfach ausprobieren!
+
+### Modell bauen
+
+Wir entscheiden uns nun für die folgenden Annahmen hinsichtlich der Verteilung der Daten
+
+\begin{equation}
+ \begin{aligned}
+ \beta_{0} &\sim \mathit{Normal}(0,10),\\
+ \beta  &\sim \mathit{Normal}(0,10),\\
+ \sigma  &\sim \mathit{Normal}_{+}(0,50).
+ \end{aligned}
+\end{equation}
+
+Wir haben hier also eigentlich ein Lineares Regressions Modell, alle parameter sind "fest" da sie unabhängig sind von der Messung selbst (Probant, Messwiederholung etc.).
+
+Unser R-Modell sieht dann wie folgt aus
+
+```{r, message=FALSE, cache=TRUE, results='hide'}
+# Klassische Statistik
+m1 <- lm(n400 ~ c_cloze, data = df_eeg)
+
+# Pooling Modell
+m2 <- brm(n400 ~ c_cloze,
+                   family = gaussian(),
+                    prior =
+                      c(
+                        prior(normal(0, 10), class = Intercept),
+                        prior(normal(0, 10), class = b, coef = c_cloze),
+                        prior(normal(0, 50), class = sigma)
+                      ),
+                    data = df_eeg
+                  )
+```
+
+Vergleichen wir einmal die Modelle
+
+```{r}
+summary(m1)
+summary(m2)
+```
+
+Ist das bayesianische Modell konvergiert? Wie sind die Simulationen gelaufen?
+```{r}
+plot(m2)
+```
+
+Eine der Annahmen des vorangegangenen Modells ist falsch: Die Beobachtungen sind nicht unabhängig, sie sind nach Probanden geclustert! 
+
+
+Es ist vernünftig anzunehmen, dass die EEG-Signale innerhalb der Probanden ähnlicher sind als zwischen ihnen.
+
+--- 
+
+## No pooling Modell
+
+
+Das folgende Modell geht davon aus, dass jedes Subjekt völlig unabhängig von den anderen ist.
+
+Die neuen Modellannahmen sind nun
+
+ - Die EEG-Mittelwerte sind normalverteilt.
+ - Das Modell eines jeden Probanden wird unabhängig von den anderen Probanden gefittet die Probanden haben keine gemeinsamen Parameter (eine Ausnahme ist die Standardabweichung)  
+- Es besteht ein linearer Zusammenhang zwischen Lückentext und dem EEG-Signal für den Versuch.
+
+
+Aber nun, welche Likelihood und Prioren können wir hier wählen?
+
+Die Wahrscheinlichkeitsverteilung ist wie zuvor eine Normalverteilung:
+
+\begin{equation}
+ signal_n \sim \mathit{Normal}( \alpha_{subj[n]} + c\_cloze_n \cdot \beta_{subj[n]},\sigma)
+\end{equation}
+
+
+### Modell bauen
+
+\begin{equation}
+ \begin{aligned}
+ \beta_{0,i} &\sim \mathit{Normal}(0,10)\\
+ \beta_{i}  &\sim \mathit{Normal}(0,10)\\
+ \sigma  &\sim \mathit{Normal}_+(0,50)
+ \end{aligned}
+\end{equation}
+
+Wir wollen jetzt für jeden Probanten einen Intercept und einen Slope Parameter geschätzt bekommen. Okay wie machen wir es?
+
+```{r, message=FALSE, cache=TRUE, results='hide'}
+m3 <- brm(n400 ~ 0 + factor(subj) + c_cloze:factor(subj),
+          family = gaussian(),
+          prior =
+            c(
+              prior(normal(0, 10), class = b),
+              prior(normal(0, 50), class = sigma)
+            ),
+          data = df_eeg
+        )
+
+```
+
+Es ist wichtig, dass der Proband als Faktor und nicht als Zahl behandelt wird.
+
+### Analyse des Modells
+
+Das plotten der Ergebnisse ist hier leider weniger gut, da hier für alle Probanten jeweils ein ergebnis ausgegeben werden würde, als nicht
+```{r, eval=FALSE}
+summary(m3)
+plot(m3)
+```
+
+Stattdessen bieten sich Funktionen an wie `mcmc_plot()`.
+
+```{r}
+brms::mcmc_plot(m3)
+```
+
+Ein Problem des No-Pooling-Modells besteht darin, dass wir die Tatsache, dass die Versuchspersonen dasselbe Experiment durchgeführt haben, völlig außer Acht lassen.
+Wir passen die Daten eines jeden Probanden an und ignorieren dabei die Informationen, die in den Daten der anderen Probanden enthalten sind.
+
+
+--- 
+
+## Random Intercept und Random Slopes
+
+In dem Modell, das wir als Nächstes gefittet, nehmen wir an, dass es einen Gesamteffekt gibt, der allen Probanden gemeinsam ist, und, was wichtig ist, dass die Parameter aller Probanden aus einer gemeinsamen (normalen) Verteilung stammen. Diese Modellspezifikation führt dazu, dass die Schätzung der Posterioren für jeden Probanden auch von dem beeinflusst wird, was wir über alle Probanden zusammen wissen.
+
+Die Wahrscheinlichkeit beinhaltet nun die Annahme, dass sowohl der Achsenabschnitt als auch die Steigung nach Subjekt angepasst sind.
+
+\begin{equation}
+  signal_n \sim \mathit{Normal}(\alpha + u_{subj[n],1} + c\_cloze_n \cdot (\beta+ u_{subj[n],2}),\sigma)
+\end{equation}
+
+
+
+\begin{equation}
+ \begin{aligned}
+ \beta_{0} &\sim \mathit{Normal}(0,10)\\
+ \beta  &\sim \mathit{Normal}(0,10)\\
+ b_1 &\sim \mathit{Normal}(0,\tau_{u_1})\\
+ b_2 &\sim \mathit{Normal}(0,\tau_{u_2})\\
+ \tau_{u_1} &\sim \mathit{Normal}_+(0,20) \\
+ \tau_{u_2} &\sim \mathit{Normal}_+(0,20) \\
+ \sigma  &\sim \mathit{Normal}_+(0,50)
+ \end{aligned}
+\end{equation}
+
+
+In diesem Modell hat jedes Subjekt seine eigene Achsenanpassung und Steigungsanpassung. Wenn diese positiv ist, hat das Subjekt ein positiveres EEG-Signal als der große Durchschnittswert. Wenn positiv, wird der Proband eine positivere EEG-Antwort auf eine Änderung von einer Einheit in c_cloze haben als der Gesamtmittelwert (d.h. es wird einen positiveren Effekt der Lückentext-Wahrscheinlichkeit auf die N400 geben). Die Parameter werden manchmal als zufällige Effekte bezeichnet, so dass ein Modell mit festen Effekten und zufälligen Effekten als gemischtes Modell bezeichnet wird.
+
+
+### Modell bauen
+
+```{r, message=FALSE, cache=TRUE, results='hide'}
+
+prior_v <-
+  c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 10), class = b, coef = c_cloze),
+    prior(normal(0, 50), class = sigma),
+    prior(normal(0, 20), class = sd, coef = Intercept, group = subj),
+    prior(normal(0, 20), class = sd, coef = c_cloze, group = subj)
+  )
+
+m4 <- brm(n400 ~ c_cloze + (c_cloze || subj),
+                  family=gaussian(),
+                  prior = prior_v,
+                  data = df_eeg
+)
+
+```
+
+```{r}
+summary(m4)
+```
+
+```{r}
+plot(m4)
+```
+
+```{r}
+
+ind_effects_v <- paste0("r_subj[", unique(df_eeg$subj), 
+                        ",c_cloze]")
+u_2_v <- posterior_summary(m4, variable = ind_effects_v) %>%
+  as_tibble() %>%
+  mutate(subj = 1:n()) %>%
+  ## reorder plot by magnitude of mean:
+  arrange(Estimate) %>%
+  mutate(subj = factor(subj, levels = subj))
+# We plot:
+ggplot(
+  u_2_v,
+  aes(x = Estimate, xmin = Q2.5, xmax = Q97.5, y = subj)
+) +
+  geom_point() +
+  geom_errorbarh()
+
+```
+
+
+--- 
+
+## 
