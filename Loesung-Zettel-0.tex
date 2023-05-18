@@ -1,0 +1,301 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Lösung Zettel 0},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lösung Zettel 0}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\hypertarget{luxf6sung-zu-uxfcbungszettel-0}{%
+\subsection{Lösung zu Übungszettel
+0}\label{luxf6sung-zu-uxfcbungszettel-0}}
+
+\hypertarget{aufgabe-1}{%
+\subsubsection{Aufgabe 1}\label{aufgabe-1}}
+
+\hypertarget{a}{%
+\paragraph{a)}\label{a}}
+
+Was haben wir?
+
+Die PRIOR Wahrscheinlichkeit, dass eine Person krank ist
+\begin{equation}
+  P(A) = 0.01 
+\end{equation}
+
+Die TRUE POSITIVE Rate bzw. Sensitivität
+
+\begin{equation}
+  P(B | A) = 0.9 
+\end{equation}
+
+Die TRUE NEGATIVE Rate bzw. Spezifizität \begin{equation}
+  P(\bar{B} | \bar{A}) = 0.9 
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Was wollen wir? Posterior Wahrscheinlichkeit, dass eine Person krank
+ist? \[
+  P(A | B)
+\]
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Wie können wir es lösen? Wir schreiben auf, wie wir \(P(A | B)\)
+berechnen.
+
+\[
+  P(A | B) = \dfrac{P(A \cap B)}{P(B)}
+\]
+
+Wir haben allerdings \(P(A \cap B)\) und \(P(B)\) nicht. Wie kann man
+diese beide berechnen? \[
+  P(A \cap B) = P(A) P(B | A) \text{ und } P(B) = P(A \cap B) + P(\bar A \cap B)
+\] Wir haben all diese Werte, sodass wir nun alles ausrechnen können.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Rechenweg:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Schritt: Schnittmengen berechnen
+\end{enumerate}
+
+\begin{align}
+
+  P(A \cap B)       &= P(A)P(B | A) = 0.01 \times 0.9 = 0.009 \\
+  P(\bar A \cap B)  &= P(\bar A)P(B | \bar A) = 0.099
+
+\end{align}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Schritt: Unconditional Wahrscheinlichkeit für positiven Test. \[
+    P(B)=P(A \cap B) + P(\bar A \cap B)= 0.009 + 0.099 = 0.108
+  \]
+\item
+  Schritt: \[
+    P(A | B) = \dfrac{P(A \cap B)}{P(B)} = \dfrac{0.009}{0.108} = \dfrac{1}{12}
+  \]
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{aufgabe-2}{%
+\subsubsection{Aufgabe 2}\label{aufgabe-2}}
+
+Berechne anhand einer Normalverteilung mit Mittelwert 500 und
+Standardabweichung 100 mit der Funktion \texttt{pnorm} die
+Wahrscheinlichkeit, Werte zwischen 200 und 800 aus dieser Verteilung zu
+erhalten
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pnorm}\NormalTok{(}\DecValTok{800}\NormalTok{, }\AttributeTok{mean =} \DecValTok{500}\NormalTok{, }\AttributeTok{sd =} \DecValTok{100}\NormalTok{) }\SpecialCharTok{{-}} \FunctionTok{pnorm}\NormalTok{(}\DecValTok{200}\NormalTok{, }\AttributeTok{mean=}\DecValTok{500}\NormalTok{, }\AttributeTok{sd=} \DecValTok{100}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.9973002
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{aufgabe-3}{%
+\subsubsection{Aufgabe 3}\label{aufgabe-3}}
+
+Berechne die folgenden Wahrscheinlichkeiten. Wie hoch ist die
+Wahrscheinlichkeit bei einer Normalverteilung mit Mittelwert 800 und
+Standardabweichung 150, dass
+
+\begin{itemize}
+\tightlist
+\item
+  eine Punktzahl von 700 oder weniger
+\item
+  eine Punktzahl von 900 oder mehr
+\item
+  eine Punktzahl von 800 oder mehr
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{Hinweis:} Die \texttt{pnorm()}-Funktion berechnet die
+Wahrscheinlichkeit für einen Wert von \(-\infty\) bis \(x\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pnorm}\NormalTok{(}\DecValTok{700}\NormalTok{, }\AttributeTok{mean=}\DecValTok{800}\NormalTok{, }\AttributeTok{sd=}\DecValTok{150}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2524925
+\end{verbatim}
+
+\textbf{Hinweis:} Wir wollen nun von \(x\) bis \(\infty\) berechnen,
+hier für gibt es zwei Lösungswege: - Entweder berechnen wir die
+Gegenwahrscheinlichkeit von \(-\infty\) bis \(x\) - Oder wir nutzen das
+Argument \texttt{lower.tail=FALSE}, welche die Berechnung ``umdreht''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Weg}
+\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{pnorm}\NormalTok{(}\DecValTok{900}\NormalTok{, }\AttributeTok{mean=}\DecValTok{800}\NormalTok{, }\AttributeTok{sd=}\DecValTok{150}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2524925
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 2.Weg}
+\FunctionTok{pnorm}\NormalTok{(}\DecValTok{900}\NormalTok{, }\AttributeTok{mean=}\DecValTok{800}\NormalTok{, }\AttributeTok{sd=}\DecValTok{150}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2524925
+\end{verbatim}
+
+\textbf{Hinweis:} Wir wollen nun von \(x\) bis \(\infty\) berechnen,
+also entweder machen wir es wie in der Aufgabe davor, oder wir sehen,
+dass wir hier einen Mittelwert Annahmen der gleich des
+Verteilungsmittelwerts ist. Da wir eine symmetrische Verteilung haben,
+berechnen wir also genau die Hälfe als 50\%.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Weg}
+\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{pnorm}\NormalTok{(}\DecValTok{800}\NormalTok{, }\AttributeTok{mean=}\DecValTok{800}\NormalTok{, }\AttributeTok{sd=}\DecValTok{150}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 2.Weg}
+\FunctionTok{pnorm}\NormalTok{(}\DecValTok{800}\NormalTok{, }\AttributeTok{mean=}\DecValTok{800}\NormalTok{, }\AttributeTok{sd=}\DecValTok{150}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5
+\end{verbatim}
+
+\end{document}

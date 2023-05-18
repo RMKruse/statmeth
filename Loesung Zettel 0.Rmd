@@ -1,0 +1,147 @@
+---
+title: "Lösung Zettel 0"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lösung zu Übungszettel 0
+
+
+### Aufgabe 1
+
+#### a)
+Was haben wir?
+
+Die PRIOR Wahrscheinlichkeit, dass eine Person krank ist
+\begin{equation}
+  P(A) = 0.01 
+\end{equation}
+
+Die TRUE POSITIVE Rate bzw. Sensitivität
+
+\begin{equation}
+  P(B | A) = 0.9 
+\end{equation}
+
+Die TRUE NEGATIVE Rate bzw. Spezifizität
+\begin{equation}
+  P(\bar{B} | \bar{A}) = 0.9 
+\end{equation}
+
+---
+
+Was wollen wir? 
+Posterior Wahrscheinlichkeit, dass eine Person krank ist?
+$$
+  P(A | B)
+$$
+
+--- 
+
+Wie können wir es lösen? Wir schreiben auf, wie wir $P(A | B)$ berechnen.
+
+$$
+  P(A | B) = \dfrac{P(A \cap B)}{P(B)}
+$$
+
+Wir haben allerdings $P(A \cap B)$ und $P(B)$ nicht. Wie kann man diese beide berechnen?
+$$
+  P(A \cap B) = P(A) P(B | A) \text{ und } P(B) = P(A \cap B) + P(\bar A \cap B)
+$$
+Wir haben all diese Werte, sodass wir nun alles ausrechnen können.
+
+---
+
+Rechenweg:
+
+1. Schritt: Schnittmengen berechnen
+
+\begin{align}
+
+  P(A \cap B)       &= P(A)P(B | A) = 0.01 \times 0.9 = 0.009 \\
+  P(\bar A \cap B)  &= P(\bar A)P(B | \bar A) = 0.099
+
+\end{align}
+
+
+2. Schritt: Unconditional Wahrscheinlichkeit für positiven Test.
+$$
+  P(B)=P(A \cap B) + P(\bar A \cap B)= 0.009 + 0.099 = 0.108
+$$
+3. Schritt: 
+$$
+  P(A | B) = \dfrac{P(A \cap B)}{P(B)} = \dfrac{0.009}{0.108} = \dfrac{1}{12}
+$$
+
+---
+
+### Aufgabe 2
+
+Berechne anhand einer Normalverteilung mit Mittelwert 500 und Standardabweichung 100 mit der Funktion \texttt{pnorm} die Wahrscheinlichkeit, Werte zwischen 200 und 800 aus dieser Verteilung zu erhalten
+
+```{r}
+
+pnorm(800, mean = 500, sd = 100) - pnorm(200, mean=500, sd= 100)
+
+```
+
+--- 
+
+### Aufgabe 3
+
+Berechne die folgenden Wahrscheinlichkeiten. 
+Wie hoch ist die Wahrscheinlichkeit bei einer Normalverteilung mit Mittelwert 800 und Standardabweichung 150, dass
+
+ - eine Punktzahl von 700 oder weniger
+ - eine Punktzahl von 900 oder mehr
+ - eine Punktzahl von 800 oder mehr
+
+---
+
+**Hinweis:**
+Die `pnorm()`-Funktion berechnet die Wahrscheinlichkeit für einen Wert von $-\infty$ bis $x$.
+
+```{r}
+
+pnorm(700, mean=800, sd=150)
+
+```
+
+**Hinweis:** 
+Wir wollen nun von $x$ bis $\infty$ berechnen, hier für gibt es zwei Lösungswege:
+ - Entweder berechnen wir die Gegenwahrscheinlichkeit von $-\infty$ bis $x$
+ - Oder wir nutzen das Argument `lower.tail=FALSE`, welche die Berechnung "umdreht".
+
+```{r}
+# 1. Weg
+1 - pnorm(900, mean=800, sd=150)
+
+# 2.Weg
+pnorm(900, mean=800, sd=150, lower.tail = FALSE)
+```
+
+**Hinweis:** 
+Wir wollen nun von $x$ bis $\infty$ berechnen, also entweder machen wir es wie in der Aufgabe davor, oder wir sehen, dass wir hier einen Mittelwert Annahmen der gleich des Verteilungsmittelwerts ist. Da wir eine symmetrische Verteilung haben, berechnen wir also genau die Hälfe als 50%.
+
+
+```{r}
+# 1. Weg
+1 - pnorm(800, mean=800, sd=150)
+
+# 2.Weg
+pnorm(800, mean=800, sd=150, lower.tail = FALSE)
+```
+
+
+
+
+
+
+
+
+
