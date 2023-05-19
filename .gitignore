@@ -3,5 +3,7 @@
 .RData
 .Ruserdat
 *.loga
-*.html
 
+Vorlesung 6/R_beispiel_6_cache/html/*.RData
+Vorlesung 6/R_beispiel_6_cache/html/*.rdb
+Vorlesung 6/R_beispiel_6_cache/html/*.rdx
