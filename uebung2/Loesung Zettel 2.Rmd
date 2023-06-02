@@ -1,6 +1,8 @@
 ---
 title: "Lösung Zettel 2"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: "2023-06-01"
 ---
 

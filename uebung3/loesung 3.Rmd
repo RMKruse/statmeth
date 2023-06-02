@@ -1,6 +1,8 @@
 ---
 title: "Lösung Zettel 3"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: "2023-06-02"
 ---
 
@@ -126,5 +128,5 @@ m_2a <- brm(RT ~ c_cond + (c_cond | subj),
 )
 m_2a
 plot(m_2a)
-posterior_summary(fit_stroop, variable = "b_c_cond")
+posterior_summary(m_2a, variable = "b_c_cond")
 ```
