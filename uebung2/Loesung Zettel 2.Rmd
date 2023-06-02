@@ -1,0 +1,183 @@
+---
+title: "Lösung Zettel 2"
+output: html_document
+date: "2023-06-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(brms)
+set.seed(42)
+```
+
+## Aufgabe 1
+
+Lade zun ̈achst den Datenrahmen df spacebar aus dem Paket `bcogsci`.
+
+```{r, dataload}
+library(bcogsci)
+data("df_spacebar")
+```
+
+---
+
+#### a)
+Es ist immer eine gute Idee, Daten grafisch darzustellen, bevor man etwas anderes tut; plotte die Daten. 
+(Unsere Response ist ”t”).
+
+#### Lösungsansatz:
+ - Histogram der Response Variable
+ - Line/Dot-Plot der Daten
+ 
+```{r, loesung_a}
+par(mfrow = c(1, 2)) # zwei Grafiken in einer Figure
+hist(df_spacebar$t)
+plot(df_spacebar$t)
+```
+
+---
+
+#### b)
+Fitte ein Intercept Model auf den Daten mit Hilfe des brms Packages. 
+t sei dabei die Response. 
+Die Angenommene Verteilungsfamilie für t ist die Normalverteilung (`gaussian()`). 
+Unterstelle erst einmal uninformative Prior: Für den Intercept $Uniform(0, 600)$ und Sigma $Uniform(0, 20)$.
+Setze die Iterationen auf 50 und das warumup auf 25. 
+Konvergiert das Model? 
+Woran erkennst du es? \textit{Hint: Anhand des R Outputs und eines Model Plots.}
+
+#### Lösungsansatz:
+```{r, message=FALSE, loesung_b, cache=TRUE, results='hide', warning=FALSE}
+model_b = brm(t ~ 1,    # Intercept: 1
+              family = gaussian(),
+              prior =
+                  c(
+                    prior(uniform(0,600), lb = 0, ub = 600, class = Intercept),
+                    prior(uniform(0,20), lb = 0, ub = 20, class = sigma)
+                  ),
+              warmup = 25,
+              iter = 50,
+                data = df_spacebar
+              )
+```
+
+Model Ergebnisse anschauen
+
+```{r}
+model_b
+```
+
+Analyse des Models
+```{r}
+plot(model_b)
+```
+
+Wir sehen hier ein Problem mit den "Catapilar" Plots. Die Graphen liegen nicht übereinander. 
+Es bedeutet, dass wir hier keine Konvergenz beobachten. Die Anzahl der Iterationen reicht scheinbar nicht aus.
+
+---
+
+#### c)
+Fitte das gleiche Modell, verändere nur die Anzahl der Iterationen auf 2000 und die Warmup auf 1000. 
+Unterstelle für den Intercept einen Prior $Uniform(0, 60000)$ und einen Sigma Pior $Uniform(0, 2000)$. 
+Konvergiert das Model? Woran machst du diese Entscheidung fest?
+
+#### Lösungsansatz:
+```{r, loesung_c, message=FALSE, cache=TRUE, results='hide', warning=FALSE}
+model_c = brm(t ~ 1,    # Intercept: 1
+              family = gaussian(),
+              prior =
+                  c(
+                    prior(uniform(0,600), lb = 0, ub = 600, class = Intercept),
+                    prior(uniform(0,20), lb = 0, ub = 20, class = sigma)
+                  ),
+                data = df_spacebar
+              )
+```
+Model Ergebnisse anschauen
+
+```{r}
+model_c
+```
+
+Analyse des Models
+```{r}
+plot(model_c)
+```
+
+Wir beobachten Konvergenz! Allerdings sehen wir, dass der Prior für das Sigma vielleicht nicht wirklich gut gewählt worden ist.
+
+---
+
+#### d)
+Wähle unter Berücksichtigung von Normalverteilung der Daten, einen Prior der besser zu den Daten passt. 
+Überlege einen vernünftigen Satz von Prior für $\mu$ und $\sigma$. 
+Begründe wie du auf diese Auswahl kommst. 
+Es gibt hier keine richtige Antwort! \textit{Die Grafik aus a) kann euch helfen einen Entscheidung zu treffen.}
+
+#### Lösungsansatz:
+
+ - Wir beobachten keine negativen Werte.
+ - 
+ 
+```{r}
+summary(df_spacebar$t)
+mean(df_spacebar$t); sd(df_spacebar$t)
+```
+
+```{r, loesung_d, message=FALSE, cache=TRUE, results='hide', warning=FALSE}
+model_d = brm(t ~ 1,    # Intercept: 1
+              family = gaussian(),
+              prior =
+                  c(
+                    prior(normal(168,30), class = Intercept),
+                    prior(normal(0,30), class = sigma)
+                  ),
+                data = df_spacebar
+              )
+```
+
+```{r}
+model_d
+```
+
+Analyse des Models
+```{r}
+plot(model_d)
+```
+
+---
+
+#### e)
+Nutze die von dir aufgestellten Prior um das neue Model zu fitten. 
+Wenn du die Modellergebnisse vergleichst was fällt dir auf? \textit{Hint: die summary() des Modells ist immer ein guter Startpunkt.}
+
+#### Lösungsansatz:
+```{r, loesung_e}
+
+```
+
+---
+
+#### f)
+Kannst du aussagekräftige Priors finden, die den Posterior in spürbarer Weise beeinflussen ? 
+(verwende  Normalverteilungen für Priors, keine gleichmäßigen Priors) 
+Auch hier gibt es keine richtigen Antworten. 
+Möglicherweise musst du mehrere verschiedene Priors ausprobieren, bevor du den Posterior merklich beeinflussen können. 
+\textit{Wiederholung: Aussagekräfte Prior: Prior die ''Wissen'' in die Analyse bringen. Z.B Weißt du vorher schon wo der Mittelwert sein müsste? Wie ist die Varianz?}
+
+#### Lösungsansatz:
+```{r, loesung_f}
+
+```
+
+---
+
+#### g)
+Erzeuge auf der Grundlage dieses neuen Priors ein Modell und zeige die Posterior Predictive Verteilungen und plotte sie. 
+\textit{Tipp: Das R-Package bayesplot hat nützliche Funktionen.}
+
+#### Lösungsansatz:
+```{r, loesung_g}
+
+```

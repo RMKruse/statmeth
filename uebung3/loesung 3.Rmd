@@ -1,0 +1,130 @@
+---
+title: "Lösung Zettel 3"
+output: html_document
+date: "2023-06-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Aufgabe 1
+
+### Libraries
+```{r, message=FALSE}
+set.seed(42)
+library(dplyr)
+library(bcogsci)
+library(brms)
+library(lme4)
+```
+
+### Laden der Daten
+```{r, cache=TRUE}
+data("sleepstudy")
+```
+
+### (a) 
+Schaue dir die Daten im Datenssatz an. Welche Verteilung würdest du für die Reaktionszeit unterstellen? Gegeben der Daten welche Prior würdest du auswählen? $(\textit{Hinweis: Es gibt nicht die EINE richtige Antwort})$
+
+```{r, loesung_1a}
+summary(sleepstudy)
+mean(sleepstudy$Reaction); sd(sleepstudy$Reaction)
+par(mfrow = c(1, 2)) # zwei Grafiken in einer Figure
+hist(sleepstudy$Reaction)
+plot(sleepstudy$Reaction)
+```
+
+- die zu erklärende Variable scheint normalverteilt zu sein.
+- ein gaussian prior scheint sinnvoll zu sein.
+
+### (b)
+Fitte ein Intercept Model und ein Model welches die Tage als erklärende Variable in das Model mit aufnimmt. Vergleiche beide Modelle, welches scheint besser zu sein?
+
+```{r, loesung_1b_1, message=FALSE, cache=TRUE, results='hide', warning=FALSE}
+m_b1 = brm(Reaction ~ 1,
+          family = gaussian(),
+          data = sleepstudy,
+          prior = c(prior(normal(300, 100), class = Intercept),
+                    prior(normal(0, 60), class = sigma)))
+
+m_b1
+
+plot(m_b1)
+
+```
+
+```{r, loesung_1b_2, message=FALSE, cache=TRUE, results='hide', warning=FALSE}
+m_b2 = brm(Reaction ~ 1 + Days,
+          family = gaussian(),
+          data = sleepstudy,
+          prior = c(prior(normal(300, 100), class = Intercept),
+                    prior(normal(0, 60), class = sigma),
+                    prior(normal(4.5, 3), class = b, coef = Days)))
+
+m_b2
+
+plot(m_b2)
+```
+
+### (c) - (d)
+In den Daten ist die Variable `Subject` enthalten. Wir haben also wiederholte Messungen. 
+Wie würdest du damit umgehen? Wie angebracht sind die bisherigen Modelle, wenn du bedenkst, dass es wiederholte Messungen gibt?
+
+```{r, loesung_1c1}
+test = aggregate(sleepstudy$Reaction, list(sleepstudy$Subject), FUN=sd)    # SD pro Gruppe
+mean(test$x); sd(sleepstudy$Reaction)
+```
+
+```{r, loesung_1c_2, message=FALSE, cache=TRUE, results='hide', warning=FALSE}
+m_c1 = brm(Reaction ~ 1 + Days + (1 | Subject),
+          family = gaussian(),
+          data = sleepstudy,
+          prior = c(prior(normal(300, 100), class = Intercept),
+                    prior(normal(0, 60), class = sigma),
+                    prior(normal(4.5, 3), class = b, coef = Days),
+                    prior(normal(0, 60), class = sd, coef = Intercept, group = Subject)))
+
+m_c1
+
+plot(m_c1)
+```
+
+---
+
+## Aufgabe 2
+
+
+
+### (a)
+```{r, cache=TRUE}
+library(bcogsci)
+data("df_stroop")
+
+df_stroop = df_stroop %>%
+  mutate(c_cond = if_else(condition == 'Incongruent', 1, -1))
+
+```
+
+```{r}
+hist(df_stroop$c_cond)
+```
+
+```{r, loesung_2d, message=FALSE, cache=TRUE, results='hide', warning=FALSE}
+
+m_2a <- brm(RT ~ c_cond + (c_cond | subj),
+  family = lognormal(),
+  prior =
+    c(
+      prior(normal(6, 1.5), class = Intercept),
+      prior(normal(0, .01), class = b),
+      prior(normal(0, 1), class = sigma),
+      prior(normal(0, 1), class = sd),
+      prior(lkj(2), class = cor)
+    ),
+  data = df_stroop
+)
+m_2a
+plot(m_2a)
+posterior_summary(fit_stroop, variable = "b_c_cond")
+```
