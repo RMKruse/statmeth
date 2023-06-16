@@ -1,7 +1,6 @@
 ---
 title: "SEM Beispiel 1"
 output:
-  pdf_document: default
   html_document: default
 date: "2023-06-14"
 ---
@@ -158,12 +157,15 @@ $\rightarrow$ Weiter in den Slides.
 
 ---
 
+## Multivariate Regression
+
 Einfache und multiple Regression modellieren jeweils ein Ergebnis ($y$) zu einem Zeitpunkt. 
 Bei der multivariaten oder simultanen linearen Regression werden mehrere Ergebnisse gleichzeitig modelliert $y_1, y_2, \dots, y_p$. 
 Das allgemeine multivariate lineare Modell ist definiert als
 $$\mathbf{y} = \mathbf{\alpha} + \mathbf{\Gamma} \mathbf{x} + \mathbf{\zeta}$$
 Um die Matrixformulierung deutlicher zu sehen, betrachten Sie zwei (d. h. bivariate) endogene Variablen ($y_1, y_2$), die von zwei exogenen Prädiktoren $x_1, x_2$ vorhergesagt werden.
-$$
+
+\begin{equation}
   \begin{pmatrix}
     y_{1} \\
     y_{2}
@@ -188,9 +190,11 @@ $$
     \zeta_{1}\\
     \zeta_{2}
   \end{pmatrix}
-$$
+\end{equation}
 
 $\Gamma$ wird als Strukturparameter bezeichnet und definiert die Beziehung zwischen exogenen und endogenen Variablen.
+
+![](m3a.png){width=60%}
 
 ```{r, cache=T}
 m3a <- 'read ~ 1 + ppsych + motiv
@@ -231,7 +235,7 @@ Die Antwort liegt in der impliziten Tatsache, dass lavaan standardmäßig die Re
 
 ![](m3d.png){width=60%}
 
-Removing the covariance of `read` and `arith` is the same as fixing its covariance to zero through the following syntax `read ~~ 0*arith`.
+Das Entfernen der Kovarianz von `read` und `arith` ist dasselbe wie das Fixieren ihrer Kovarianz auf Null durch die folgende Syntax `read ~~ 0*arith`.
 
 ```{r, cache=T}
 
@@ -248,3 +252,107 @@ summary(fit3d)
 
 ```
 
+$\rightarrow$ Weiter in den Slides.
+
+---
+
+## Path Analysis
+
+Die multivariate Regression ist ein Spezialfall der Pfadanalyse, bei der nur die exogenen Variablen die endogenen Variablen vorhersagen. Die Pfadanalyse ist ein allgemeineres Modell, bei dem alle Variablen immer noch manifest sind, aber endogene Variablen andere endogene Variablen erklären können. 
+$$
+\mathbf{y = \alpha + \Gamma x + By + \zeta}
+$$
+
+Erweitern wir unser vorheriges multivariates Regressionsmodell 3A dahingehend, dass wir davon ausgehen, dass Lesen, das eine endogene Variable ist, die auch arith voraussagt. Das Pfaddiagramm für Modell 4A sieht dann wie folgt aus. Was ist der einzige Pfad, der sich zwischen Modell 3A und 4A unterscheidet?
+
+![](m4a.png){width=60%}
+
+$$
+\begin{pmatrix}
+y_{1} \\
+y_{2}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\alpha_1 \\
+\alpha_2
+\end{pmatrix}
++
+\begin{pmatrix}
+\gamma_{11} & \gamma_{12}\\
+0 & \gamma_{22}
+\end{pmatrix}
+\begin{pmatrix}
+x_1 \\
+x_2
+\end{pmatrix}
++
+\begin{pmatrix}
+0 & 0\\
+\beta_{21} & 0
+\end{pmatrix}
+\begin{pmatrix}
+y_1 \\
+y_2
+\end{pmatrix}
++
+\begin{pmatrix}
+\zeta_{1}\\
+\zeta_{2}
+\end{pmatrix}
+$$
+
+**Definitionen:**
+
+  - y : zu erklärende (endogene) Variablen
+  - x : exogene Variablen
+  - $\alpha$ : Intercepts
+  - $\Gamma$ : Matrix der Regressionskoeffizienten der exogenen Variablen (im linearen Modell $\beta$)
+  - $B$ : Matrix der Regressionskoeffizienten der endogenen Variablen.
+  - $\xi$ : Vektor der Residuen
+
+
+
+```{r, cache=T}
+
+m4a <-'read ~ 1 + ppsych + motiv
+       arith ~ 1 + motiv + read'
+
+fit4a <- sem(m4a, data=dat)
+
+summary(fit4a)
+
+```
+
+Es zeigt sich, dass die Lesekompetenz eine positive Vorhersage für die Rechenleistung darstellt, die über die Auswirkungen der Motivation hinausgeht.
+Für jede Einheit, um die sich die Leseleistung erhöht, wird also ein Anstieg der Rechenleistung um 0,573 Punkte vorhergesagt. 
+Beachte auch, dass im Gegensatz zu Modell 3A die residuale Kovarianz von .arith und .read standardmäßig ausgeschaltet ist. 
+Dies liegt daran, dass wir durch die Hinzufügung eines Regressionspfads von Lesen zu Rechnen davon ausgehen, dass Lesen die gesamte Varianz in Rechnen ausmacht, so dass eine Restkovarianz unnötig ist.
+
+$\rightarrow$ Weiter in den Slides.
+
+---
+
+## Model Fit
+
+Standardmäßig gibt `lavaan` das Chi-Quadrat des Modells aus, auch bekannt als Model Test User Model. 
+Um zusätzliche Anpassungsstatistiken anzufordern, fügt man die Option `fit.measures=TRUE` zu summary hinzu und übergibt das lavaan-Objekt.
+
+```{r, cache=T}
+summary(fit4a, fit.measures=TRUE)
+```
+
+**Zur Analyse**: Die wichtigsten Vier
+
+1. **Modell-Chi-Quadrat** ist die Chi-Quadrat-Statistik, die wir aus der Maximum-Likelihood-Statistik erhalten (in Lavaan ist dies als Teststatistik für das Modell-Test-Benutzermodell bekannt)
+
+2. **CFI** ist der Comparative Fit Index - die Werte können zwischen 0 und 1 liegen (Werte größer als 0,90, konservativ 0,95 deuten auf eine gute Anpassung hin)
+3. **TLI** ist der Tucker-Lewis-Index, der ebenfalls zwischen 0 und 1 liegt (wenn er größer als 1 ist, sollte er auf 1 gerundet werden), wobei Werte über 0,90 auf eine gute Anpassung hindeuten. Wenn CFI und TLI kleiner als 1 sind, ist der CFI immer größer als der TLI.
+4. **RMSEA** ist der mittlere quadratische Fehler der Approximation
+- In Lavaan erhalten Sie auch einen p-Wert für eine gute Anpassung, d. h. der RMSEA < 0,05. Wenn Sie das Modell ablehnen, bedeutet dies, dass Ihr Modell nicht genau passt.
+
+### Exkurs: Baseline Model
+
+Das Basismodell kann als das "am schlechtesten passende" Modell betrachtet werden und geht einfach davon aus, dass es absolut keine Kovarianz zwischen den Variablen gibt. Angenommen, wir ändern Modell 4A so ab, dass es zu einem Basismodell wird, würden wir alle Pfade und Kovarianzen herausnehmen und im Wesentlichen nur die Varianzen schätzen. Da es keine Regressionspfade gibt, gibt es auch keine endogenen Variablen in unserem Modell und wir hätten nur 
+
+![](m4c.png){width=60%}

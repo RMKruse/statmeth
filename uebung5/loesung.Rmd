@@ -1,0 +1,113 @@
+---
+title: "Uebungszettel 5"
+output: html_document
+date: "2023-06-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lavaan)
+```
+
+## 1. Aufgabe 
+
+### (a)
+Einlesen der Daten
+```{r, cache=T}
+data(PoliticalDemocracy)
+```
+
+### (b)
+Anschauen der Daten
+```{r, cache=T}
+head(PoliticalDemocracy)
+summary(PoliticalDemocracy)
+```
+
+### (c)
+Covariance der erklärenden Variablen anschauen
+```{r, cache=T}
+cov(PoliticalDemocracy[c("x1", "x2", "x3")])
+```
+
+### (d)
+Baue ein einfaches lineares Modell in dem die Größe `y1` durch `x1`, `x2` und `x3` erklärt wird.
+Baue das selbe Modell mit dem Package `lavaan`. Vergleiche beide Modelle was kannst du erkennen?
+Gehe auf mögliche Unterschiede ein.
+
+Bauen der Modelle
+```{r, cache=T}
+m_lm <- lm(y1 ~ 1 + x1 + x2 + x3, data = PoliticalDemocracy)
+m_gleichung <- 'y1 ~ 1 + x1 + x2 + x3'
+m_1 <- sem(m_gleichung, 
+             data=PoliticalDemocracy)
+```
+
+Vergleich der Modellergebnisse
+```{r, cache=T}
+summary(m_lm)
+summary(m_lavan)
+```
+
+Lösung
+
+ - Auch wenn beide Modelle ein Intercept annehmen gibt das SEM keinen aus.
+ - Die Schätzer für die Std. Error sind ungleich. 
+    - Grund LM nutzt LS-Schätzung, und SEM die ML Methode. Der ML Std. Schätzer ist verzerrt (bias).
+    
+
+### (e)
+Lasst uns unterstellen, dass neben dem y1 auch y2 und y3 jeweils durch die drei X Variablen erklärt werden soll.
+Erstelle nun ein Multivariates SEM Modell.
+
+```{r, cache=T}
+m_gleichung <- 'y1 ~ 1 + x1 + x2 + x3
+                y2 ~ 1 + x1 + x2 + x3
+                y3 ~ 1 + x1 + x2 + x3'
+m_2 <- sem(m_gleichung, 
+             data=PoliticalDemocracy)
+summary(m_2)
+```
+
+### (f)
+Die SEM Modelle fitten automatisch Covarianzen auf die Modelle, gehe davon aus, dass du mehr weißt als der PC und eine eigene Covarianz Struktur auf die Residuen aufstellen willst. 
+Du nimmst an, dass die Covarianz Struktur wie folgt ist:
+ 
+ - Es gibt eine Covarianz Beziehung zwischen y1 und y3 und
+ - Es gibt eine zweite y2 auf y1 OHNE y3
+ 
+Vergleich die Modelle aus (e) und (f) was fällt dir auf?
+```{r, cache=T}
+m_gleichung <- 'y1 ~ 1 + x1 + x2 + x3
+                y2 ~ 1 + x1 + x2 + x3
+                y3 ~ 1 + x1 + x2 + x3
+                y1 ~~ y3
+                y2 ~~ y1 + 0*y3'
+m_3 <- sem(m_gleichung, 
+             data=PoliticalDemocracy)
+summary(m_3)
+```
+
+### (g)
+Du hast jetzr drei SEM Modelle gebaut. Vergleiche die Modelle, wähle das "beste" Modell aus und begründe deine Entscheidung. *Hinweis*: Bei einer Modellauswahl sollte man immer mehr als ein Entscheidungskriterium anschauen. *Vorsicht*: Ist nicht so einfach wie es erst aussieht.
+
+```{r, model1, cache=T}
+summary(m_1, fit.measures=TRUE)
+summary(m_2, fit.measures=TRUE)
+summary(m_3, fit.measures=TRUE)
+
+```
+Entscheidungskriterien
+
+ - Model Chi-Squared Test : 
+    - M1 : 12.662 (0.005)
+    - M2 : 0 ???? (0.000)
+    - M3 : 13.981 (0.000)
+    
+  - CFI/TI :
+    - M1 : 1 / 1
+    - M2 : 1 / 1
+    - M3 : 0.85 / -0.802
+    
+  
+    
