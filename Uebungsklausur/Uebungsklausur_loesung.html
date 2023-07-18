@@ -459,6 +459,7 @@ oder bayesianische Modelle erlauben ebenfalls eine Regression.</p>
 <pre><code>## The following object is masked from &#39;package:stats&#39;:
 ## 
 ##     ar</code></pre>
+<pre class="r"><code>set.seed(42)</code></pre>
 <ol style="list-style-type: lower-alpha">
 <li>Lese die gegeben Daten <code>datensatz1.rda</code>in R ein. (1
 Punkt)</li>
@@ -521,123 +522,12 @@ model_c &lt;- brm(y ~ 1 + x1 + x2,
                    prior(normal(2.5, 1.8),  class = b, coef = x1),
                    prior(normal(125, 200), class = b, coef = x2)
                  ),
+               cores = 10,
                control = list(adapt_delta = 0.9),    
                save_pars = save_pars(all = TRUE)
             )</code></pre>
 <pre><code>## Compiling Stan program...</code></pre>
-<pre><code>## Trying to compile a simple C file</code></pre>
-<pre><code>## Running /usr/lib64/R/bin/R CMD SHLIB foo.c
-## using C compiler: ‘gcc (GCC) 13.1.1 20230614 (Red Hat 13.1.1-4)’
-## gcc -I&quot;/usr/include/R&quot; -DNDEBUG   -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/Rcpp/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/unsupported&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/BH/include&quot; -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/src/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppParallel/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/rstan/include&quot; -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include &#39;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp&#39;  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer   -c foo.c -o foo.o
-## In file included from /home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/Eigen/Dense:1,
-##                  from /home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13,
-##                  from &lt;command-line&gt;:
-## /home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/Eigen/Core:82:12: fatal error: new: No such file or directory
-##    82 |   #include &lt;new&gt;
-##       |            ^~~~~
-## compilation terminated.
-## make: *** [/usr/lib64/R/etc/Makeconf:191: foo.o] Error 1</code></pre>
 <pre><code>## Start sampling</code></pre>
-<pre><code>## 
-## SAMPLING FOR MODEL &#39;de0e03145212c8024ce12efedd9e0936&#39; NOW (CHAIN 1).
-## Chain 1: 
-## Chain 1: Gradient evaluation took 6e-06 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
-## Chain 1: Adjust your expectations accordingly!
-## Chain 1: 
-## Chain 1: 
-## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 1: 
-## Chain 1:  Elapsed Time: 0.014137 seconds (Warm-up)
-## Chain 1:                0.005937 seconds (Sampling)
-## Chain 1:                0.020074 seconds (Total)
-## Chain 1: 
-## 
-## SAMPLING FOR MODEL &#39;de0e03145212c8024ce12efedd9e0936&#39; NOW (CHAIN 2).
-## Chain 2: 
-## Chain 2: Gradient evaluation took 2e-06 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
-## Chain 2: Adjust your expectations accordingly!
-## Chain 2: 
-## Chain 2: 
-## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 2: 
-## Chain 2:  Elapsed Time: 0.012519 seconds (Warm-up)
-## Chain 2:                0.005414 seconds (Sampling)
-## Chain 2:                0.017933 seconds (Total)
-## Chain 2: 
-## 
-## SAMPLING FOR MODEL &#39;de0e03145212c8024ce12efedd9e0936&#39; NOW (CHAIN 3).
-## Chain 3: 
-## Chain 3: Gradient evaluation took 2e-06 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
-## Chain 3: Adjust your expectations accordingly!
-## Chain 3: 
-## Chain 3: 
-## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 3: 
-## Chain 3:  Elapsed Time: 0.017838 seconds (Warm-up)
-## Chain 3:                0.006036 seconds (Sampling)
-## Chain 3:                0.023874 seconds (Total)
-## Chain 3: 
-## 
-## SAMPLING FOR MODEL &#39;de0e03145212c8024ce12efedd9e0936&#39; NOW (CHAIN 4).
-## Chain 4: 
-## Chain 4: Gradient evaluation took 2e-06 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
-## Chain 4: Adjust your expectations accordingly!
-## Chain 4: 
-## Chain 4: 
-## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 4: 
-## Chain 4:  Elapsed Time: 0.01706 seconds (Warm-up)
-## Chain 4:                0.006213 seconds (Sampling)
-## Chain 4:                0.023273 seconds (Total)
-## Chain 4:</code></pre>
 <pre class="r"><code>summary(model_c)</code></pre>
 <pre><code>##  Family: gaussian 
 ##   Links: mu = identity; sigma = identity 
@@ -648,13 +538,13 @@ model_c &lt;- brm(y ~ 1 + x1 + x2,
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   659.72     27.54   605.83   712.58 1.00     3928     2767
-## x1            2.85      1.74    -0.58     6.28 1.00     4031     2945
-## x2            0.07      0.12    -0.15     0.30 1.00     4252     2923
+## Intercept   660.00     27.49   605.29   713.59 1.00     4502     2731
+## x1            2.87      1.75    -0.52     6.31 1.00     4713     2721
+## x2            0.07      0.12    -0.16     0.30 1.00     5146     3036
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma   151.10     16.95   121.28   187.74 1.00     3696     2612
+## sigma   150.82     17.05   121.88   187.10 1.00     3787     2840
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -695,123 +585,12 @@ sollte oder nicht. Begründe. (4 Punkte)</li>
                    prior(normal(0, 150), class = sigma),
                    prior(normal(2.5, 1.8),  class = b, coef = x1)
                  ),
+               cores = 10,
                control = list(adapt_delta = 0.9),    
                save_pars = save_pars(all = TRUE)
             )</code></pre>
 <pre><code>## Compiling Stan program...</code></pre>
-<pre><code>## Trying to compile a simple C file</code></pre>
-<pre><code>## Running /usr/lib64/R/bin/R CMD SHLIB foo.c
-## using C compiler: ‘gcc (GCC) 13.1.1 20230614 (Red Hat 13.1.1-4)’
-## gcc -I&quot;/usr/include/R&quot; -DNDEBUG   -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/Rcpp/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/unsupported&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/BH/include&quot; -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/src/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppParallel/include/&quot;  -I&quot;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/rstan/include&quot; -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include &#39;/home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp&#39;  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer   -c foo.c -o foo.o
-## In file included from /home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/Eigen/Dense:1,
-##                  from /home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13,
-##                  from &lt;command-line&gt;:
-## /home/rkruse/R/x86_64-redhat-linux-gnu-library/4.3/RcppEigen/include/Eigen/Core:82:12: fatal error: new: No such file or directory
-##    82 |   #include &lt;new&gt;
-##       |            ^~~~~
-## compilation terminated.
-## make: *** [/usr/lib64/R/etc/Makeconf:191: foo.o] Error 1</code></pre>
 <pre><code>## Start sampling</code></pre>
-<pre><code>## 
-## SAMPLING FOR MODEL &#39;4175251074adf374a88c56a751756fca&#39; NOW (CHAIN 1).
-## Chain 1: 
-## Chain 1: Gradient evaluation took 5e-06 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.05 seconds.
-## Chain 1: Adjust your expectations accordingly!
-## Chain 1: 
-## Chain 1: 
-## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 1: 
-## Chain 1:  Elapsed Time: 0.016346 seconds (Warm-up)
-## Chain 1:                0.005626 seconds (Sampling)
-## Chain 1:                0.021972 seconds (Total)
-## Chain 1: 
-## 
-## SAMPLING FOR MODEL &#39;4175251074adf374a88c56a751756fca&#39; NOW (CHAIN 2).
-## Chain 2: 
-## Chain 2: Gradient evaluation took 2e-06 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
-## Chain 2: Adjust your expectations accordingly!
-## Chain 2: 
-## Chain 2: 
-## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 2: 
-## Chain 2:  Elapsed Time: 0.011231 seconds (Warm-up)
-## Chain 2:                0.004989 seconds (Sampling)
-## Chain 2:                0.01622 seconds (Total)
-## Chain 2: 
-## 
-## SAMPLING FOR MODEL &#39;4175251074adf374a88c56a751756fca&#39; NOW (CHAIN 3).
-## Chain 3: 
-## Chain 3: Gradient evaluation took 3e-06 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.03 seconds.
-## Chain 3: Adjust your expectations accordingly!
-## Chain 3: 
-## Chain 3: 
-## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 3: 
-## Chain 3:  Elapsed Time: 0.019026 seconds (Warm-up)
-## Chain 3:                0.005711 seconds (Sampling)
-## Chain 3:                0.024737 seconds (Total)
-## Chain 3: 
-## 
-## SAMPLING FOR MODEL &#39;4175251074adf374a88c56a751756fca&#39; NOW (CHAIN 4).
-## Chain 4: 
-## Chain 4: Gradient evaluation took 2e-06 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
-## Chain 4: Adjust your expectations accordingly!
-## Chain 4: 
-## Chain 4: 
-## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 4: 
-## Chain 4:  Elapsed Time: 0.014327 seconds (Warm-up)
-## Chain 4:                0.005339 seconds (Sampling)
-## Chain 4:                0.019666 seconds (Total)
-## Chain 4:</code></pre>
 <pre class="r"><code># Bayes Faktor
 margLogLik_m1 &lt;- bridge_sampler(model_c, silent = TRUE)
 margLogLik_m2 &lt;- bridge_sampler(model_e, silent = TRUE)
@@ -840,25 +619,125 @@ margLogLik_m2 &lt;- bridge_sampler(model_e, silent = TRUE)
 ##         elpd_diff se_diff
 ## model_c  0.0       0.0   
 ## model_e -0.1       0.1</code></pre>
+<p><strong>Antwort:</strong> Wir können erkennen, dass das zweite Modell
+um <code>0.1</code> Punkte schlechter ist. Also eine absolute minimale
+Verschlechterung. Jetzt kann man streng argumentieren, dass das
+schlechter ist und somit das erste Modell besser ist . Man kann aber
+auch argumentieren, dass durch das weglassen von einer ganzen Variablen
+der Wert sich um einen absolut geringen Wert von <code>0.1</code>
+verschlechtert. Es könnte man auch so interepretieren, dass somit die
+die Variable nicht wichtig ist. Beides verständliche Argumentationen.
+(In einer Klausur kommt es auf DEINE Interpretation an!)</p>
 <ol start="6" style="list-style-type: lower-alpha">
 <li>Interpretiere die Ergebnisse für die Schätzer der Parameter des
 Modells was du in (d) ausgewählt hast. (3 Punkte)</li>
 </ol>
+<pre class="r"><code># Sagen wir mal, dass das erste Modell besser ist
+summary(model_c)</code></pre>
+<pre><code>##  Family: gaussian 
+##   Links: mu = identity; sigma = identity 
+## Formula: y ~ 1 + x1 + x2 
+##    Data: datensatz1 (Number of observations: 41) 
+##   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+##          total post-warmup draws = 4000
+## 
+## Population-Level Effects: 
+##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## Intercept   660.00     27.49   605.29   713.59 1.00     4502     2731
+## x1            2.87      1.75    -0.52     6.31 1.00     4713     2721
+## x2            0.07      0.12    -0.16     0.30 1.00     5146     3036
+## 
+## Family Specific Parameters: 
+##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sigma   150.82     17.05   121.88   187.10 1.00     3787     2840
+## 
+## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <p><strong>Antwort:</strong></p>
+<ul>
+<li>Der Intercept, also der Wert wenn alle anderen Variablen Null wären,
+dann hätten wir im Durchschnitt einen Effekt (Wert) von
+<code>660.15</code> mit einem Schätzfehler (Estimation Error) von
+<code>27.32</code>.</li>
+<li>Der Effekt von <code>x1</code>, also wenn <code>x1</code> um eine
+Einheit ansteigt, steigt der Wert von <code>y</code> im Mittel wenn
+alles andere konstant bleibt (c.p.) um <code>2.88</code> mit einem
+Schätzfehler von <code>1.76</code>.</li>
+<li>Der Effekt von <code>x2</code>, also wenn <code>x2</code> um eine
+Einheit ansteigt, steigt der Wert von <code>y</code> im Mittel wenn
+alles andere konstant bleibt (c.p.) um <code>0.07</code> mit einem
+Schätzfehler von <code>0.11</code>.</li>
+<li>Die geschätzte Modellvarianz beträgt <code>151.37</code> mit einem
+Schätzfehler von <code>17.64</code>.</li>
+</ul>
 <hr />
 </div>
 <div id="aufgabe-3-strukturgleichungsmodelle-punkte" class="section level1">
 <h1>Aufgabe 3: Strukturgleichungsmodelle (Punkte)</h1>
+<pre class="r"><code>library(lavaan)</code></pre>
+<pre><code>## This is lavaan 0.6-15
+## lavaan is FREE software! Please report any bugs.</code></pre>
 <ol style="list-style-type: lower-alpha">
-<li><p>Lese den Datensatz <code>datensatz2.csv</code> ein. (1
-Punkt)</p></li>
-<li></li>
+<li>Lese den Datensatz <code>datensatz2.csv</code> ein. (1 Punkt)</li>
 </ol>
-<p>(2 Punkte)</p>
-<p><strong>Antwort:</strong></p>
+<pre class="r"><code># Erste Möglichkeit
+library(readr)
+datensatz2 &lt;- read_csv(&quot;datensatz2.csv&quot;)</code></pre>
+<pre><code>## Rows: 75 Columns: 6
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## dbl (6): y1, y2, y3, x1, x2, x3
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code># Zweite Möglichkeit
+datensatz2 &lt;- read.csv(&quot;datensatz2.csv&quot;)</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Wir bauen ein Measurement Modell, welche erst einmal aus den
+erklärenden Variablen <span class="math inline">\(x_1, x_2\)</span> und
+<span class="math inline">\(x_3\)</span> eine neue latente Größe
+erstellt, welche wir nutzen um die Variable <code>y1</code> zu erklären.
+Erst einmal nehmen wir keine speziellen Annahmen an über die
+Correlationen. Kommt dabei das gleiche Ergebnis raus, wenn wir die
+Variable <code>y1</code> direkt durch <span class="math inline">\(x_1,
+x_2\)</span> und <span class="math inline">\(x_3\)</span> erklären? (4
+Punkte)</li>
+</ol>
+<pre class="r"><code>m_gleichung &lt;- &#39;Var1 =~ x1 + x2 + x3
+                y1 ~ Var1&#39; 
+m_b &lt;- sem(m_gleichung, data=datensatz2)</code></pre>
+<p><strong>Antwort:</strong> Nein, es wird nicht das gleiche Modell
+(Ergebnis) dabei herauskommen, da das Measurement Modell eine Form der
+Faktoranalyse macht, und die X Variablen nicht zu 100 genutzt
+werden.</p>
 <ol start="3" style="list-style-type: lower-alpha">
-<li>(8 Punkte)</li>
+<li>Erstelle zwei Modelle, welche zwei latente Variablen aus einmal
+<span class="math inline">\(\xi_1\)</span> : <span class="math inline">\(x_1, x_2\)</span> und aus <span class="math inline">\(\xi_2\)</span> : <span class="math inline">\(x_1,
+x_3\)</span> erstellt. Im ersten Modell soll <code>y1</code> durch nur
+<span class="math inline">\(\xi_1\)</span>, und <code>y2</code> durch
+nur <span class="math inline">\(\xi_2\)</span> erklärt werden. Im zweite
+Modell soll <code>y1</code> durch nur <span class="math inline">\(\xi_1,
+\xi_2\)</span>, und <code>y2</code> durch nur <span class="math inline">\(\xi_1, \xi_2\)</span> erklärt werden. Welches
+dieser beiden Modelle ist das beste? Begründe. (8 Punkte)</li>
 </ol>
+<pre class="r"><code># Model 1
+m_gleichung &lt;- &#39;Var1 =~ x1 + x2
+                Var2 =~ x1 + x3
+                y1 ~ Var1 
+                y2 ~ Var2&#39; 
+m_c1 &lt;- sem(m_gleichung, data=datensatz2)</code></pre>
+<pre><code>## Warning in lav_object_post_check(object): lavaan WARNING: covariance matrix of latent variables
+##                 is not positive definite;
+##                 use lavInspect(fit, &quot;cov.lv&quot;) to investigate.</code></pre>
+<pre class="r"><code># Model 2
+m_gleichung &lt;- &#39;Var1 =~ x1 + x2
+                Var2 =~ x1 + x3               
+                y1 ~ Var1 + Var2
+                y2 ~ Var2 + Var1&#39; 
+m_c2 &lt;- sem(m_gleichung, data=datensatz2)</code></pre>
+<pre><code>## Warning in lavaan::lavaan(model = m_gleichung, data = datensatz2, model.type = &quot;sem&quot;, : lavaan WARNING:
+##     the optimizer warns that a solution has NOT been found!</code></pre>
 <p><strong>Antwort:</strong></p>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>(4 Punkte)</li>
