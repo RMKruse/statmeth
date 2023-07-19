@@ -34,7 +34,7 @@ output:
 
 ## Anzahl der Aufgaben: 3 (in echter Klausur 4)
 
-## Gesamtpunktzahl: ???
+## Gesamtpunktzahl: 50
 
 ---
 
@@ -85,7 +85,7 @@ Im Model $y_1 = \alpha + \gamma x_1 + \zeta_1$ $y_1$ steht dafür, dass es nur e
 # Aufgabe 2: Bayesianisches Modell (20 Punkte)
 
 *Setup:*
-```{r}
+```{r, cache=TRUE}
 library(brms)
 set.seed(42)
 ```
@@ -220,9 +220,9 @@ summary(model_c)
 
 ---
 
-# Aufgabe 3: Strukturgleichungsmodelle (Punkte)
+# Aufgabe 3: Strukturgleichungsmodelle (18 Punkte)
 
-```{r}
+```{r, cache=TRUE}
 library(lavaan)
 ```
 
@@ -230,7 +230,7 @@ library(lavaan)
 Lese den Datensatz `datensatz2.csv` ein. 
 (1 Punkt)
 
-```{r}
+```{r, cache=TRUE}
 # Erste Möglichkeit
 library(readr)
 datensatz2 <- read_csv("datensatz2.csv")
@@ -240,44 +240,80 @@ datensatz2 <- read.csv("datensatz2.csv")
 ```
 
 (b)
-Wir bauen ein Measurement Modell, welche erst einmal aus den erklärenden Variablen $x_1, x_2$ und $x_3$ eine neue latente Größe erstellt, welche wir nutzen um die Variable `y1` zu erklären.
-Erst einmal nehmen wir keine speziellen Annahmen an über die Correlationen. 
-Kommt dabei das gleiche Ergebnis raus, wenn wir die Variable `y1` direkt durch $x_1, x_2$ und $x_3$ erklären?
+Wir bauen ein Measurement Modell, welche erst einmal aus den erklärenden Variablen $x_1, x_2, x_3, x_4, x_5$ eine neue latente Größe $\xi_1$ erstellt.
+Darüberhinaus erstellen wir eine weitere latente Variable $\xi_2$ aus $x_5, x_6$.
+Erst einmal nehmen wir keine speziellen Annahmen an über die Covarianz/Correlationen. 
 (4 Punkte)
 
-```{r}
+```{r, cache=TRUE}
 
-m_gleichung <- 'Var1 =~ x1 + x2 + x3
-                y1 ~ Var1' 
+m_gleichung <- '# measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7'
 m_b <- sem(m_gleichung, data=datensatz2)
 
 
 ```
 
-**Antwort:** Nein, es wird nicht das gleiche Modell (Ergebnis) dabei herauskommen, da das Measurement Modell eine Form der Faktoranalyse macht, und die X Variablen nicht zu 100 genutzt werden.
+
 
 (c)
-Erstelle nun ein Modell welche die Größen $y5 + y6 + y7 + y8$ nutzt um eine weitere neue Größe `Var3` zu bemessen.
-Füge dem Modell noch eine Regressions Komponente `y ~ Variable 1 + ... + Variable k` hinzu, bei der du `Var1` und `Var2` nutzt um `Var3` zu erklären.
-Welches dieser beiden Modelle ist das beste? Begründe.
-(8 Punkte)
+Nutze die beiden erstellten latenten Variablen aus (b) um das unterstellte `y` zu erklären.
+Kommt das selbe Ergebnis dabei raus, wenn du statt den latenten Varialben direkt $x_1, x_2, x_3, x_4, x_5, x_6, x_7$ nutzt ? Begründe.
+(4 Punkte)
 
-```{r}
-m_gleichung <- 'Var1 =~ x1 + x2 + x3
-                Var2 =~ y1 + y2 + y3 
-                Var3 ~ Var1 + Var2' 
-m_c1 <- sem(m_gleichung, data=datensatz2)
+```{r, cache=TRUE}
+m_gleichung <- '#regression
+                y ~ f1+ f2
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7' 
+m_c <- sem(m_gleichung, data=datensatz2)
 
 ```
 
-**Antwort:**
+**Antwort:** Nein, es wird nicht das gleiche Modell (Ergebnis) dabei herauskommen, da das Measurement Modell eine Form der Faktoranalyse macht, und die X Variablen nicht zu 100 genutzt werden. Beispiel: Wenn wir das reine $x$ Model bauen, und annahmen dass beide Modelle gleich sind, dann müssten beide Modelle die selben Werte z.B. AIC aufweisen. Wie hier zu sehen ist dem nicht so (auch wenn das mOdell nicht fertig konvergiert ... nun.)
+
+```{r, cache=TRUE}
+m_gleichung <- '#regression
+                y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7' 
+m_c2 <- sem(m_gleichung, data=datensatz2)
+AIC(m_c, m_c2)
+```
 
 
 (d) 
-(4 Punkte)
+Erstelle das selbe Modell noch einmal, nur unterstelle jetzt, dass es eine implizite Covarianz/Correlation zwischen $x_4$ und $x_6$ gibt.
+Baue diese in das neue Modell ein. Vergleiche das Model aus (c) und aus (d), welches dieser Modelle schätzt du als besser geeignet ein?
+(9 Punkte)
 
-```{r}
+```{r, cache=TRUE}
+m_gleichung <- '#structural
+                y ~ f1+ f2
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7
+                #correlation
+                x6 ~~ x4
+                '
+m_d <- sem(m_gleichung, datensatz2)
+```
+
+
+```{r, cache=TRUE}
+summary(m_c, fit.measures = TRUE)
+summary(m_d, fit.measures = TRUE)
 
 ```
 
 **Antwort:**
+
+  - Informationskriterien: Model (c) besser
+  - RMSEA : Model (d) besser
+  - SRMR: Model (c) besser
+  - CFI/TLI : Model (d) besser
+
+Entscheidung: Wir können hier kein eindeutiges Ergebnis erkennen. Es kommt hierbei ganz klar auf eure Argumentation an. Ich persönlich würde mich für das Model aus c entscheiden, da hier ganze drei Informationskriterien für dieses Modell sprechen. Allerdings wäre eine Argumentation genauso richtig zu sagen, dass ein geringerer Fehler für ein besseres Modell sprich, was basierent auf dem RMSEA für das MOdel aus (d) spricht.

@@ -388,8 +388,8 @@ Antwort genommen.</li>
 <div id="anzahl-der-aufgaben-3-in-echter-klausur-4" class="section level2">
 <h2>Anzahl der Aufgaben: 3 (in echter Klausur 4)</h2>
 </div>
-<div id="gesamtpunktzahl" class="section level2">
-<h2>Gesamtpunktzahl: ???</h2>
+<div id="gesamtpunktzahl-50" class="section level2">
+<h2>Gesamtpunktzahl: 50</h2>
 <hr />
 </div>
 <div id="aufgabe-1-12-punkte" class="section level1">
@@ -428,7 +428,7 @@ und Maximum-Likelihood Schätzung eines Modells. (2 Punkte)</li>
 </ol>
 <p><strong>Antwort:</strong></p>
 <ol start="5" style="list-style-type: lower-alpha">
-<li>Bei Bayesianischen Modellen wollen wir die Posterior Verteilung
+<li>Bei bayesianischen Modellen wollen wir die Posterior Verteilung
 berechnen. (2 Punkte)</li>
 </ol>
 <p><strong>Antwort:</strong></p>
@@ -439,8 +439,9 @@ einziges Modellframework Regression durchzuführen. (2 Punkte)</li>
 <p><strong>Antwort:</strong></p>
 <hr />
 </div>
-<div id="aufgabe-2-bayesianisches-modell-18-punkte" class="section level1">
-<h1>Aufgabe 2: Bayesianisches Modell (18 Punkte)</h1>
+<div id="aufgabe-2-bayesianisches-modell-20-punkte" class="section level1">
+<h1>Aufgabe 2: Bayesianisches Modell (20 Punkte)</h1>
+<p><em>Setup:</em></p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Lese die gegeben Daten <code>datensatz1.rda</code>in R ein. (1
 Punkt)</p></li>
@@ -451,41 +452,53 @@ Verteilung folgt diese? Was bedeutet es für ein bayesianisches Modell?
 <p><strong>Antwort:</strong></p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Gegeben der Daten baue ein einfaches bayesianisches Modell, welche
-die Variablen <code>x1</code>und <code>x2</code> nutzt um <code>y</code>
-zu erklären. Hierbei nimm an, dass du kein eigenes Wissen über die Daten
-hast. Wie würdest du die Prior auswählen? Begründe deine Entscheidungen.
-(8 Punkte)</li>
+die Variablen <code>x1</code>, <code>x2</code> und einen Intercept nutzt
+um <code>y</code> zu erklären. Hierbei nimm an, dass du kein eigenes
+Wissen über die Daten hast. Wie würdest du die Prior auswählen? Begründe
+deine Entscheidungen. (8 Punkte)</li>
 </ol>
 <p><strong>Antwort:</strong></p>
 <ol start="4" style="list-style-type: lower-alpha">
+<li>Ist das Modell konvergiert? Begründe.</li>
+</ol>
+<p><strong>Antwort:</strong></p>
+<ol start="5" style="list-style-type: lower-alpha">
 <li>Nach betrachten der Daten behauptet einer deiner Kommilitonen, dass
 die Variable <code>x2</code> keinerlei Einfluss auf <code>y</code> haben
 sollte. Untersuche ob Variable <code>x2</code> ein Platz im Modell haben
 sollte oder nicht. Begründe. (4 Punkte)</li>
 </ol>
 <p><strong>Antwort:</strong></p>
-<ol start="5" style="list-style-type: lower-alpha">
+<ol start="6" style="list-style-type: lower-alpha">
 <li>Interpretiere die Ergebnisse für die Schätzer der Parameter des
 Modells was du in (d) ausgewählt hast. (3 Punkte)</li>
 </ol>
 <p><strong>Antwort:</strong></p>
 <hr />
 </div>
-<div id="aufgabe-3-strukturgleichungsmodelle-punkte" class="section level1">
-<h1>Aufgabe 3: Strukturgleichungsmodelle (Punkte)</h1>
+<div id="aufgabe-3-strukturgleichungsmodelle-18-punkte" class="section level1">
+<h1>Aufgabe 3: Strukturgleichungsmodelle (18 Punkte)</h1>
+<p><em>Setup:</em></p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Lese den Datensatz <code>datensatz2.csv</code> ein. (1
 Punkt)</p></li>
-<li></li>
-</ol>
-<p>(2 Punkte)</p>
-<p><strong>Antwort:</strong></p>
-<ol start="3" style="list-style-type: lower-alpha">
-<li>(8 Punkte)</li>
+<li><p>Wir bauen ein Measurement Modell, welche erst einmal aus den
+erklärenden Variablen <span class="math inline">\(x_1, x_2, x_3, x_4,
+x_5\)</span> eine neue latente Größe <span class="math inline">\(\xi_1\)</span> erstellt. Darüberhinaus erstellen
+wir eine weitere latente Variable <span class="math inline">\(\xi_2\)</span> aus <span class="math inline">\(x_5, x_6\)</span>. Erst einmal nehmen wir keine
+speziellen Annahmen an über die Covarianz/Correlationen. (4
+Punkte)</p></li>
+<li><p>Nutze die beiden erstellten latenten Variablen aus (b) um das
+unterstellte <code>y</code> zu erklären. Kommt das selbe Ergebnis dabei
+raus, wenn du statt den latenten Varialben direkt <span class="math inline">\(x_1, x_2, x_3, x_4, x_5, x_6, x_7\)</span> nutzt ?
+Begründe. (4 Punkte)</p></li>
 </ol>
 <p><strong>Antwort:</strong></p>
 <ol start="4" style="list-style-type: lower-alpha">
-<li>(4 Punkte)</li>
+<li>Erstelle das selbe Modell noch einmal, nur unterstelle jetzt, dass
+es eine implizite Covarianz/Correlation zwischen <span class="math inline">\(x_4\)</span> und <span class="math inline">\(x_6\)</span> gibt. Baue diese in das neue Modell
+ein. Vergleiche das Model aus (c) und aus (d), welches dieser Modelle
+schätzt du als besser geeignet ein? (9 Punkte)</li>
 </ol>
 <p><strong>Antwort:</strong></p>
 </div>

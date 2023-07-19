@@ -36,6 +36,44 @@ summary(fit_pupil)
 plot(fit_pupil)
 
 
-data = PoliticalDemocracy
-data = subset(data, select = c(y1, y3, y4, x1, x2, x3))
-write.csv(data, file = "datensatz2.csv", row.names = FALSE)
+
+# Daten erstellen für die SEM Aufgabe 
+library(lavaan)
+tosim <- '
+
+#structural component
+y ~ .5*f1 + .7*f2  #strength of regression with external criterion
+
+
+#measurement component
+f1 =~ .8*x1 + .6*x2 + .7*x3 + .8*x4 + .75*x5  #definition of factor f with loadings on 5 items
+
+x1 ~~ (1-.8^2)*x1 #residual variances. Note that by using 1-squared loading, we achieve a total variability of 1.0 in each indicator (standardized)
+x2 ~~ (1-.6^2)*x2
+x3 ~~ (1-.7^2)*x3
+x4 ~~ (1-.8^2)*x4
+x5 ~~ (1-.75^2)*x5
+
+f2 =~ .8*x6 + .9*x7
+x6~~(1-.8^2)*x6*x4
+x7~~(1-.9^2)*x7
+
+f1~~.2*f2
+'
+
+# generate data; note, standardized lv is default
+sim_df <- simulateData(tosim, sample.nobs=200)
+write.csv(sim_df, file = "datensatz2.csv", row.names = FALSE)
+
+# Model bauen
+
+m_gleichung <- '#structural
+                y ~ f1+ f2
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7
+                #correlation
+                x6 ~~ x4
+                '
+sem_model <- sem(m_gleichung, sim_df)
+summary(sem_model, fit.measures = TRUE)
