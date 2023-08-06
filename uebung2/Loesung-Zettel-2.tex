@@ -112,7 +112,7 @@
 \hypertarget{aufgabe-1}{%
 \subsection{Aufgabe 1}\label{aufgabe-1}}
 
-Lade zun nächst den Datenrahmen df spacebar aus dem Paket
+Lade zun ̈achst den Datenrahmen df spacebar aus dem Paket
 \texttt{bcogsci}.
 
 \begin{Shaded}
@@ -169,6 +169,8 @@ Konvergiert das Model? Woran erkennst du es?
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{df\_spacebar\_new }\OtherTok{=}\NormalTok{ df\_spacebar}
+\NormalTok{df\_spacebar\_new}\SpecialCharTok{$}\NormalTok{t }\OtherTok{\textless{}{-}}\NormalTok{ (df\_spacebar\_new}\SpecialCharTok{$}\NormalTok{t)}\SpecialCharTok{/}\DecValTok{10}
 \NormalTok{model\_b }\OtherTok{=} \FunctionTok{brm}\NormalTok{(t }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{,    }\CommentTok{\# Intercept: 1}
               \AttributeTok{family =} \FunctionTok{gaussian}\NormalTok{(),}
               \AttributeTok{prior =}
@@ -207,11 +209,11 @@ Model Ergebnisse anschauen
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   168.68      0.72   167.30   170.36 1.10       73       43
+## Intercept   168.85      0.84   167.46   170.55 1.02      182       94
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    14.83      2.72    11.33    20.00 2.19        7       18
+## sigma    18.06      2.04    14.23    19.99 2.87        7       14
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -277,11 +279,11 @@ Model Ergebnisse anschauen
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   168.65      1.08   166.53   170.82 1.00     2052     1853
+## Intercept   168.67      1.02   166.71   170.64 1.00     2491     2237
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    19.90      0.10    19.66    20.00 1.00     1677      948
+## sigma    19.91      0.09    19.66    20.00 1.00     1918     1391
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -377,11 +379,11 @@ kommst. Es gibt hier keine richtige Antwort!
 ## 
 ## Population-Level Effects: 
 ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept   168.60      1.33   165.98   171.25 1.00     2945     2368
+## Intercept   168.62      1.32   166.09   171.19 1.00     3760     2580
 ## 
 ## Family Specific Parameters: 
 ##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma    24.99      0.93    23.27    26.85 1.00     2965     2475
+## sigma    24.98      0.92    23.33    26.95 1.00     3716     2514
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential

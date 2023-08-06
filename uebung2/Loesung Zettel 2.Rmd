@@ -50,6 +50,8 @@ Woran erkennst du es? \textit{Hint: Anhand des R Outputs und eines Model Plots.}
 
 #### Lösungsansatz:
 ```{r, message=FALSE, loesung_b, cache=TRUE, results='hide', warning=FALSE}
+df_spacebar_new = df_spacebar
+df_spacebar_new$t <- (df_spacebar_new$t)/10
 model_b = brm(t ~ 1,    # Intercept: 1
               family = gaussian(),
               prior =
