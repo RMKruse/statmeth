@@ -1,0 +1,383 @@
+---
+title: "How-to Bayesian Models"
+author: "René-M. Kruse"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(bcogsci)
+library(dplyr)
+data("df_spacebar")
+data("df_eeg")
+(df_eeg <- df_eeg %>%
+    mutate(c_cloze = cloze - mean(cloze)))
+```
+
+# 0. Set-Up
+Wir arbeiten das Beispiel anhand des EKG Datensatzes aus der 6. Vorlesung durch.
+
+Einlesen der Libraries
+
+```{r, message=FALSE}
+set.seed(42)
+library(dplyr)
+library(bcogsci)
+library(ggplot2)
+library(brms)
+```
+
+
+# 1. Daten Analyse
+Nach dem Einlesen der Daten stellt sich erst einmal die Frage, was für Daten haben wir? Hierbei interessieren wir uns vor allem wie die Familie (Likelihood) der Daten und mögliche Prior für die Modelle aussehen müssten. Fangen wir mit Schritten an um die Familie für die Likelihood festzustellen.
+
+## 1.1 Likelihood
+
+Es gibt im großen und ganzen zwei Klassen von Daten.
+
+  1. Stetige Daten, `1.2231` also Zahlen mit Nachkommastellen.
+  2. Diskrete Daten, `1, 2, ..., 2123`. Ganzzahlige Werte
+
+Je nach Form der Daten gibt es verschiede Verteilungen welche den Daten zugrund liegen könnten. 
+Für Stetige Verteilungen sind hierbei vor allem zu nennen:
+
+  1. Normalverteilung - In R `gaussian()`
+  2. Log-Normal - In R `lognormal()`
+  3. Gammaverteilung - in R `gamma()`
+
+Für diskrete Verteilungen sind hierbei vor allem zu nennen:
+
+  1. Bernoulli Verteilung - In R `bernoulli()`
+  2. Binomial Verteilung - In R `binomial()`
+
+Wie gehen wir jetzt vor?
+
+1. Schritt: Beschreibene Statistiken erzeugen. 
+
+	1. `summary()` -  gibt eine Zusammenfassung der Daten, 
+	2. `head()` - gibt die ersten sechs Zeilen aus, 
+	3. `mean()` - Arithmetisches Mittel einer Variable, 
+	4. `sd()`- Standard Abweichung einer Variable
+	
+2.  Schritt: Graphische Analyse
+	1. Histogram - In R `hist`
+
+```{r, cache=T}
+summary(df_eeg)
+```
+
+```{r, echo=FALSE}
+df_eeg %>% ggplot(aes(n400)) +
+  geom_histogram(
+    binwidth = 4,
+    alpha = .5,
+    aes(y = after_stat(density))
+  ) +
+  stat_function(fun = dnorm, args = list(
+    mean = mean(df_eeg$n400),
+    sd = sd(df_eeg$n400)
+  ))
+```
+
+**Ergebnis**: Es scheint auf jeden Fall schon einmal so, dass unsere zu erklärende Variable normalverteilt ist!
+
+## 1.2 Prior
+
+Bei einer Bayesianischen Analyse ist es wichtig, dass du deine vorherige Unsicherheit über die Modellparameter angibst (Prior). Bitte bedenke, dass dies einfach ein Teil des Modellierungsprozesses ist! 
+
+Bei der Auswahl einer geeigneten Prior-Verteilung werden in der Regel die Gesamtform (Form und Bereich) der Verteilung sowie ihre Hauptmerkmale wie Mittelwert und Varianz berücksichtigt.
+
+Es stellt sich also die Frage, wie man am besten einen Prior auswählt.
+Entweder wisst ihr auf Grund von vorigem Wissen wie die Prior aussehen müssten ODER ihr versucht erst einmal nah den daten zu sein.
+
+### 1.2.1 Einfachste Methode: Gleichverteilung
+
+Für einen Gleichverteilungsprior müssen wir uns einfach anschauen welche Werte die jeweilige Variable annehmen kann. Nehmen wir hierfür das df_egg Beispiel aus den Übungen.
+
+```{r, cache=T}
+summary(df_eeg)
+```
+
+Möchten wir also nur einen Gleichverteilungsprior für die Variable `cloze` erstellen, so nehmen wir als untere Grenze den minmalsten Wert (vielleicht sogar etwas kleiner) also hier: `-0.6` und als obersten Wert `0.6` als gröten beobachteten Wert.
+
+### 1.2.2 Spezifische Prior: Daten anschauen
+
+Wenn ihr spezifischere Prior haben wollt, besteht der Prozess aus zwei Schritten:
+
+  1. Welcher Verteilung hat die Variable?
+  2. Welche Parameter (Mittelwert, Varianz, usw.) hat die Verteilung.
+
+Am einfachsten ist es für den Intercept des Modells, wir nutzen einfach die Summary Funktion und schauen uns die Werte für die zu erklärende Variable an.   
+
+also wieder:
+
+```{r, cache=T}
+summary(df_eeg$n400)
+mean(df_eeg$n400)
+sd(df_eeg$n400)
+hist(df_eeg$n400)
+```
+
+**Ergebnis Intercept**: Der Mean liegt bei `3.664555` und die sd bei `11.84764`. Wir können nun also einfach den Prior ungefähr bei diesen Werten anlegen. Ein sinnvoller wäre z.B. Normal(3.6, 13.0). Es macht Sinn die Standardabweichung etwas größer zu machen als der beobachtete Wert.
+
+### 1.2.3 Spezial Fall Standardabweichung
+
+Die Standardabweichung ist ein Sonderfall der Prior, da diese NIEMALS kleiner als 0 sein kann! 
+Allerdings weiß es R und setz für sich selbst die untere Grenze möglicherweiser Werte! 
+Nichtsdesto setze den erwartungswert NICHT unter 0.
+
+
+---
+
+# 2. Modell bauen
+
+Du musst dir die Frage stellen, was für einen Zusammenhang soll untersucht werden? Und wie stell ich die Annahmen richtig in das Modell ein?
+
+## 2.1 Modell Klassen
+
+Wir haben im Rahmen des Modells drei verschiedene Modellklassen behandelt.
+
+ 1. Lineares Modell
+ 2. Logistisches Modell
+ 3. Hierachisches Modell
+
+### 2.1.1 Lineares Modell
+
+Ist die zu erklärende Variable "stetig"? Sind die Daten am besten normalverteilt? Gibt es KEINE Klassen in den Daten? Dann Lineares Modell.
+
+Für ein Lineares Modell müsst ihr die folgenden Dinge haben bzw. aufstellen:
+
+ - $y$ : zu erklärende Variable
+ - $x_1$,.., .$x_k$ : Erklärende Variablen
+ - daten : Datensatz
+ - family : Die Verteilung der Daten
+ - prior : Vektor für die Prior der Verteilungen
+  - Intercept als: `prior(verteilung(a, b), class = Intercept)`
+  - beta1, .., betak: `prior(verteilung(a, b), class = b, coef = Name Variable)`
+  - sigma: `prior(verteilung(a, b), class = sigma)`
+
+```{r, eval=F}
+model = brm(y ~ x1 +  ... + xk, 
+            data = daten,
+            family = Verteilung,
+            prior = c(prior1, prior2))
+```
+
+Also mit unserem Datensatz und den Erkenntnissen aus der Datenanalyse ergibt sich das folgende Modell:
+
+```{r, message=FALSE, cache=TRUE, results='hide'}
+lineares_model <- brm(n400 ~ c_cloze,
+                   family = gaussian(),
+                    prior =
+                      c(
+                        prior(normal(3.6, 13.0), class = Intercept),
+                        prior(normal(0, 10), class = b, coef = c_cloze),
+                        prior(normal(0, 50), class = sigma)
+                      ),
+                    data = df_eeg,
+                   save_pars = save_pars(all = TRUE)
+                  )
+```
+
+### 2.1.2 Hierachisches Modell
+
+Generell erweitern hierachische Modelle lineare Modelle um die Möglichkeit Gruppen-spezifische Terme aufzunehmen.
+Für eine genaue Aufschlüsslung der Hierachischen Modelle schaut euch einfach das RMarkdown zu de Thema an.
+
+Für ein hierachisches Modell müsst ihr die folgenden Dinge haben bzw. aufstellen:
+
+ - $y$ : zu erklärende Variable
+ - $x_1$,.., .$x_k$ : Erklärende Variablen, welche auf in Random Gruppen fallen können.
+ - daten : Datensatz
+ - family : Die Verteilung der Daten
+ - prior : Vektor für die Prior der Verteilungen
+  - Intercept als: `prior(verteilung(a, b), class = Intercept)`
+  - beta1, .., betak: `prior(verteilung(a, b), class = b, coef = Name Variable)`
+  - random effekte: 
+    - Random Intercept: `prior(verteilung(a, b), class = sd, coef = Intercept, group = 'Gruppen Variable')`
+    - Random Slope : `prior(verteilung(a, b), class = sd, coef = Variablen Name, group = Gruppen Variable)`
+    - Correlation: Wenn du Korrelation erlauben willst ein `|`, ohne mit zweien `||` 
+  - sigma: `prior(verteilung(a, b), class = sigma)`
+
+```{r, eval=F}
+model = brm(y ~ x1 +  ... + xk + (x1 | Gruppen Variable) + (x2 || Gruppen Variable), 
+            data = daten,
+            family = Verteilung,
+            prior = c(prior1, prior2)
+            )
+```
+
+Mit unserem Beispeil erstellen wir ein hierachisches Modell.
+Wir wissen:
+
+ - Daten sind normalverteilt : family=gaussian()
+ - Gruppen in den Daten : Gruppen Variable = subj
+ - Wollen `n400` mit `c_cloze` erklären
+ - Haben `c_cloze` auch als Random Effekt
+ - Haben keine Correlation zwischen den Random Variablen
+ - Haben ein Random Intercept 
+
+```{r, message=FALSE, cache=TRUE, results='hide'}
+
+prior_v <-
+  c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 10), class = b, coef = c_cloze),
+    prior(normal(0, 50), class = sigma),
+    prior(normal(0, 20), class = sd, coef = Intercept, group = subj),
+    prior(normal(0, 20), class = sd, coef = c_cloze, group = subj)
+  )
+
+hiera_model1 <- brm(n400 ~ c_cloze + (c_cloze || subj),
+                  family=gaussian(),
+                  prior = prior_v,
+                  data = df_eeg,
+                  save_pars = save_pars(all = TRUE)
+)
+
+```
+
+Das gleiche Modell MIT Correlation zwischen den Random Effekten:
+
+```{r, message=FALSE, cache=TRUE, results='hide'}
+
+prior_v <-
+  c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 10), class = b, coef = c_cloze),
+    prior(normal(0, 50), class = sigma),
+    prior(normal(0, 20), class = sd, coef = Intercept, group = subj),
+    prior(normal(0, 20), class = sd, coef = c_cloze, group = subj),
+    prior(lkj(2), class = cor)
+  )
+
+hiera_model2 <- brm(n400 ~ c_cloze + (c_cloze | subj),
+                  family=gaussian(),
+                  prior = prior_v,
+                  data = df_eeg,
+                  save_pars = save_pars(all = TRUE)
+)
+
+```
+
+
+---
+
+# 3. Modellanalyse
+
+Nach dem wir jetzt ein Modell gebaut haben möchten wir schauen, wie "gut" das Model ist.
+
+## 3.1 Modell Check
+
+Die ersten Fragen sind: "Ist das Modell konvergiert?" und "Scheinen die Ergebnisse gut zu sein?"
+Beide Fragen kann man über die `plot()`-Funktion überprüfen.
+
+```{r, cache=T}
+plot(hiera_model)
+```
+
+Ist das Modell konvergiert? 
+Die Graphen auf der rechten Seite sollten übereinander liegen, sie sollten aussehen wie Raupen weswegen diese auch als "Caterpillar" Plots bekannt sind. Sollten die Plots nicht übereinanderliegen ist der erste Schritt die Iterationen zu erhöhen (siehe R Markdown Files). 
+
+Scheinen die Ergebnisse gut zu sein? 
+Wir können links sehen wie die Ergebnisse für die Parameter aussehen.
+Sind die Plots nach links oder rechts abgeschnitten? Gibt es eindeutige maximal Punkte? Sollte dem nicht so sein müssten die Prior angepasst werden (Mittelwert kleiner/größer, Sd anpassen, Verteilung des Priors anpassen?)
+
+## 3.2 Modell Interpretation
+
+Wie interpretieren wir den Summary Output?
+
+```{r, cache=T}
+summary(hiera_model)
+```
+
+Im Allgemeinen wird jeder Parameter mit dem Mittelwert (Estimate) und der Standardabweichung (Est.Error) der Posterior-Verteilung sowie mit zweiseitigen 95%-Glaubwürdigkeitsintervallen (l-95% CI und u-95% CI) auf der Grundlage von Quantilen zusammengefasst.
+Der Wert Eff.Sample ist eine Schätzung des effektiven Stichprobenumfangs, d. h. der Anzahl unabhängiger Stichproben aus der Posterior-Verteilung, von denen man erwarten würde, dass sie denselben Standardfehler des Posterior-Mittelwerts ergeben wie die abhängigen Stichproben, die der MCMC-Algorithmus liefert. Der Rhat-Wert gibt Auskunft über die Konvergenz des Algorithmus.  Ist Rhat deutlich größer als 1 (d. h. > 1,1), sind die Ketten noch nicht konvergiert und es ist notwendig, mehr Iterationen durchzuführen und/oder stärkere Prioren zu setzen.
+
+### 3.2.1 Fixe Effekte
+
+Beginnen wir mit den "fixen" Populations-Effekte
+
+```{r, eval=FALSE}
+Population-Level Effects: 
+            Estimate Est.Error  l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept     3.63      0.42     2.80     4.44    1.00   1523     2158
+c_cloze       2.34      0.61     1.15     3.58    1.00   4743     2956
+
+```
+
+Der Intercept, wenn alle anderen Effekte gleich Null sind, dann ist der durchschnittliche Effekt `3.63`.
+Der Estimation Error (vergleichbar zum Std. Error) der Schätzung ist `0.42`, mit den Credible Intervalls `2.80` und `4.44`.
+
+Sollte die Variable `c_cloze`sich um eine Einheit erhöhen, dann verändert sich unser `y` `n400` ceteris paribus durchschnittlich um `2.34` Einheiten. Die restlichen größen sind gleich zu interpretieren.
+
+### 3.2.2 Random Effekte 
+
+Und jetzt zu den gruppen-spezifischen Effekten
+
+```{r, eval=F}
+Group-Level Effects: 
+~subj (Number of levels: 37) 
+                       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS  Tail_ESS
+sd(Intercept)              2.20      0.37     1.55     3.03 1.00     1689   2523
+sd(c_cloze)                1.59      0.90     0.11     3.43 1.00     1099   1622
+cor(Intercept,c_cloze)     0.17      0.35    -0.55     0.79 1.00     4189   2841
+
+```
+
+Die `sd` Effekte geben die Std. der jeweiligen Gruppen-spezifischen Effekte wider. 
+`cor` stellt den Schätzer für die Korrelation zwischen den Random Effekts dar.
+
+
+## 3.3. Modelbau Checkliste
+
+- [ ] Wie soll das Modell aussehen? (Modellgleichung)
+  - [ ] Was ist unser `y`?
+  - [ ] Was sind die Variablen? 
+  - [ ] Gibt es Random Effekts?
+- [ ] Welche Verteilung hat unser `y`? 
+- [ ] Welche Prior passen zu den (Random) Variablen?
+- [ ] Ist das Modell konvergiert?
+- [ ] Sehen die Prior Ergebnisse "gut" aus?
+
+---
+
+# 4.  Modellbewertung und -wahl
+
+Ein letzter wichtiger Punkt ist die Bewertung von Modellen und die Auswahl des "besten" Modells.
+Wichtiger Punkt dabei ist, dass wir immer nur Modelle mit einander vergleichen die die selben Daten erklären.
+
+## 4.1 Bayes Faktor
+Der Bayes-Faktor ist ein Maß für die relative Evidenz, also den Vergleich der Vorhersageleistung eines Modells mit der eines anderen. Dieser Vergleich ist ein Verhältnis der marginalen Likelihoods.
+
+
+Zu erst einmal die Marginalen Likelihood berechnen. Dafür mussten wir in der Modellgleichung das Argument `save_pars = save_pars(all = TRUE)` einfügen.
+
+```{r, cache=T}
+margLogLik_m1 <- bridge_sampler(hiera_model1, silent = TRUE)
+margLogLik_m2 <- bridge_sampler(hiera_model2, silent = TRUE)
+```
+So erhalten wir die marginalen log Likelihoods für jedes der Modelle. Aus diesen können wir die Bayes-Faktoren berechnen. Die Funktion `bayes_factor()` ist eine praktische Funktion zur Berechnung des Bayes-Faktors!
+
+```{r}
+(BF_ln <- bayes_factor(margLogLik_m1, margLogLik_m2))
+```
+
+Das Ergebnis zeigt uns, dass das erste model leicht besser ist als das zweite. 
+Zur Interpretation schaut euch das Rmarkdown an, zur aufschlüsslung der möglichen Werte. 
+
+
+## 4.2 WAIC
+
+Alternativ können wir Informatinoskriterien wie das WAIC nutzen. Der kleinere Wert ist besser.
+In diesem Beispiel könnt ihr sehen, dass es ein Problem mit dem Befehl `WAIC` besteht, eine Alternative dazu ist der Befehl `loo` was genau das gleiche macht, nur ab und an besser funktioniert.
+
+```{r, cache=T}
+WAIC(hiera_model1, hiera_model2)
+loo(hiera_model1, hiera_model2)
+
+```
+
+
+---
+

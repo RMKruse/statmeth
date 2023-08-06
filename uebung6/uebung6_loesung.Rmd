@@ -1,0 +1,151 @@
+---
+title: "Lösung Zettel 6"
+output:
+  pdf_document: default
+  html_document: default
+date: "2023-06-02"
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Aufgabe 1
+
+Wenn die Aussage falsch ist, begründe wieso.
+
+**Wahr oder falsch? **
+\newline 
+
+Im Model $y_1 = \alpha + \gamma x_1 + \zeta_1$ $y_1$ steht dafür, dass es nur eine Beobachtung gibt. \newline
+
+*Antwort:* Falsch. Die $1$ in dem Modell steht jeweils für die erste Variable $y$. Wir können in SEM Modellen mehrere $y$-Variablen haben.
+        
+**Wahr oder falsch? **
+\newline 
+
+Die Regressionskoeffizienten einer gewöhnlichen Regression mit kleinsten Quadraten entsprechen der einer Maximum-Likelihood Schätzung, aber die Residualvarianz unterscheidet sich zwischen den beiden. \newline
+
+*Antwort:* Wahr. (Begründung hier nicht gebraucht da wahr, aber der Grund dafür ist der dass der KQ Schätzer der Varianz die Form $\hat{\sigma} = \frac{\hat{\varepsilon}^{T} \hat\varepsilon}{N- K}$, mit $N$ = Anzahl der Beobachtungen, $K$ = Anzahl der Parameter ($\boldsymbol{\beta}$) hat. Wir wissen aus der Theorie, dass die Schätzer das korrekte Ergebnis liefert. der ML Varianz-Schätzer sieht hingegen wie folgt aus $\hat{\sigma} = \frac{\hat{\varepsilon}^{T} \hat\varepsilon}{N}$ und entspricht somit nicht dem "korrekten" Ergebnis und ist damit Verzerrt (engl. Biased).)
+
+**Wahr oder falsch? **
+\newline 
+
+In einem Modell gibt es zwei Regressions Koeffizienten $\gamma$ weil es zwei exogene Variablen gibt. Bei demselben Modell würde sich dies auch nicht ändern, wenn wir den Stichprobenumfang erhöhen. \newline
+
+*Antwort:* Wahr. (Begründung hier nicht gebraucht da wahr, aber der Grund dafür ist, dass die Anzahl der Regressions Koeffizienten, also unsere Einfluss-parameter, nichts damit zu tun haben wie viele Beobachtungen wir haben. Bsp.: Eisverkauf. Wir schreiben uns die Temperatur und den Preis pro Kugel auf. Wir haben als zwei Koeffzienten. Jetzt notieren wir die Werte für 30 Tage. Wir haben also nun 30 Beobachtungen. Schreiben wir jetzt noch eine weitere Woche auf, dann erhöht sich die Anzahl der Beobachtungen auf 37 Tage, aber die Anzahl der Parameter Temperatur und Preis bleibt gleich.)        
+
+
+
+# Aufgabe 2
+
+Vorbreitung: 
+
+Wir wollen SEMs (**S**tructural **E**quation **M**odels = **S**truktur**g**leichungs**m**odelle) bauen. Dafür brauchen wir das `lavaan` R-Package.
+UND WICHTIG! Wir setzen einen seed.
+
+*Hinweis zu SEM Syntax:*
+ 
+ 1. `=~` Measurement Modell, wir bauen uns eine neue Variable.
+ 2. `~`  Regressionsmodell, wir machen eine klassische Regression.
+ 3. `~~` Covarianz. Wir Modellieren eine spezifische Covarianz, inkl. Correlation.
+ 
+    3.1. Sonderfall: `~~ 0` wir setzen eine Covarianz, inkl Correlation, gleich Null und entfernen sie aus dem Modell.
+
+```{r}
+library(lavaan)
+set.seed(42)
+```
+
+## a)
+Lade zunächst den Datensatz ''PoliticalDemocracy' aus dem Paket lavaan.
+
+```{r, cache=T}
+data("PoliticalDemocracy")
+```
+
+*Hinweis:* Ihr werdet in der Klausur ein Datensatz gestellt bekommen, ihr müsst diesen über die Funktion zum Einlesen der Daten nutzen.
+
+## b)
+Wir bauen ein Measurement Modell, welche erst einmal aus den erklärenden Variablen $x_1, x_2$ und $x_3$ eine neue latente Größe "misst" die wir `Var1` nennen.
+Erst einmal nehmen wir keine speziellen Annahmen an über die Correlationen. 
+
+```{r, cache=T}
+m_gleichung <- 'Var1 =~ x1 + x2 + x3' 
+m_b <- sem(m_gleichung, data=PoliticalDemocracy)
+```
+
+*Erklärung:* Wir schreiben also die Modellgleichung auf. Die Syntax des Ganzen ist genau wie bei einer normalen Regression wie mit `lm()`, nur nutzen wir ` =~ ` was R sagt, dass wir eine NEUE Variable bauen. 
+
+## c)
+Wir erweitern nun das erste Modell, um eine weitere Measurement Modellgleichung, welche die Größen $y1 + y2 + y3 + y4$ nutzt um eine weitere neue Größe `Var2` zu bemessen.
+Füge dem Modell noch eine Regressions Komponente `y ~ Variable 1 + ... + Variable k` hinzu, bei der du `Var1` nutzt um `Var2` zu erklären.
+
+```{r, cache=T}
+m_gleichung <- 'Var1 =~ x1 + x2 + x3
+                Var2 =~ y1 + y2 + y3 + y4
+                Var2 ~ Var1' 
+m_c <- sem(m_gleichung, data=PoliticalDemocracy)
+```
+
+*Erklärung:* Wir schreiben also die Modellgleichung wie in (b) auf, schreiben dann nur unter der ersten Gleichung die anderen zwei, wobei ein Measurement Modell `=~` und eine Regression `~` betrachtet wird . 
+
+
+## d)
+Wir erweitern nun das letzte Modell, um noch eine weitere Measurement Modellgleichung, welche die Größen $y5 + y6 + y7 + y8$ nutzt um eine weitere neue Größe `Var3` zu bemessen.
+Füge dem Modell noch eine Regressions Komponente `y ~ Variable 1 + ... + Variable k` hinzu, bei der du `Var1` und `Var2` nutzt um `Var3` zu erklären.
+
+```{r, cache=T}
+m_gleichung <- 'Var1 =~ x1 + x2 + x3
+                Var2 =~ y1 + y2 + y3 + y4
+                Var3 =~ y5+ y6 + y7 + y8
+                Var3 ~ Var1 + Var2' 
+m_d <- sem(m_gleichung, data=PoliticalDemocracy)
+```
+
+
+## e)
+Wir erweitern nun das letzte Modell, um noch eine explizite residuale Korrelationsstruktur.
+Unterstellte hierbei die folgende Korrelationsstruktur zwischen:
+
+  - `y1` und `y5`
+  - `y2` und `y4` und `y6`
+  - `y3` und `y7`
+  - `y4` und `y8`
+  - `y5` und `y8`
+
+
+```{r, cache=T}
+m_gleichung <- 'Var1 =~ x1 + x2 + x3
+                Var2 =~ y1 + y2 + y3 + y4
+                Var3 =~ y5+ y6 + y7 + y8
+                Var3 ~ Var1 + Var2
+                y1 ~~ y5
+                y2 ~~ y4 + y6
+                y3 ~~ y7
+                y4 ~~ y8
+                y5 ~~ y8'
+m_e <- sem(m_gleichung, data=PoliticalDemocracy)
+```
+
+## f)
+Vergleiche die Modelle aus d) und e). Wenn du dich für ein Modell entscheiden müsstest, welches würdest du nehmen? 
+Begründe wieso?
+
+*Entscheidung:*
+
+ - Das zweite Modell scheint sich besser dafür zu eignen die unterliegenden Daten zu analysieren.
+
+**Begründung:**
+
+ 1. Informationskriterien: Alle drei Kriterien (AIC, BIC und SABIC) zeigen geringere Werte für das zweite Modell. (*Hinweis:* Kleine Informationskriterien = Besser.)
+ 2. Root Mean Square Error of Approximation: Der Fehler der Approximation spricht für das zweite Modell, da diese Werte geringer ausfallen.(*Hinweis:* Kleine RMSE = Besser.)
+ 3. Standardized Root Mean Square Residual: Auch hier sind die Werte geringer für das zweite Modell und somit besser.
+ 4. User Model versus Baseline Model: `CFI` und `TLI` weisen bessere Werte für das zweite Modell auf. (*Hinweis:* Diese Größen vergleichen nur mit dem BASELINE Modell. Da die beiden betrachteten Modelle die selben Varialen nutzen, sind die Baseline Modelle für beide gleich, sodass diese Werte auch zum Vergleich beider unserer Modelle erlaubt.)
+
+```{r, cache=T}
+summary(m_d, fit.measures=T)
+summary(m_e, fit.measures=T)
+
+AIC(m_d, m_e)
+```

@@ -1,0 +1,112 @@
+---
+title: "Loesung6"
+output: html_document
+date: "2023-06-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lavaan)
+```
+
+## R Markdown
+
+### a)
+Einlesen der Daten `PoliticalDemocracy`.
+```{r, cache=T} 
+data(PoliticalDemocracy)
+```
+
+### b)
+Wir bauen ein Measurement Modell, welche erst einmal aus den erklärenden Variablen $x_1, x_2$ und $x_3$ eine neue latente  Größe "misst" die wir `Var1` nennen.
+Erst einmal nehmen wir keine speziellen Annahmen an über die Correlationen. 
+
+```{r, cache=T}
+
+model = '# measurement model
+         Var1 =~ x1 + x2 + x3'
+
+fit <- sem(model, data = PoliticalDemocracy)
+summary(fit, standardized = TRUE)
+
+```
+
+### c)
+Wir erweitern nun das erste Modell, um eine weitere Measurement Modellgleichung, welche die Größen $y1 + y2 + y3 + y4$ nutzt um eine weitere neue Größe `Var2` zu bemessen.
+Füge dem Modell noch eine Regressions Komponente `y ~ Variable 1 + ... + Variable k` hinzu, bei der du `Var1` nutzt um `Var2` zu erklären.
+```{r, cache=T}
+
+model = '# measurement model
+         Var1 =~ x1 + x2 + x3
+         Var2 =~ y1 + y2 + y3 + y4
+         # regression
+         Var2 ~ Var1'
+
+fit <- sem(model, data = PoliticalDemocracy)
+summary(fit, standardized = TRUE)
+
+```
+
+
+### d)
+Wir erweitern nun das letzte Modell, um noch eine weitere Measurement Modellgleichung, welche die Größen $y5 + y6 + y7 + y8$ nutzt um eine weitere neue Größe `Var3` zu bemessen.
+Füge dem Modell noch eine Regressions Komponente `y ~ Variable 1 + ... + Variable k` hinzu, bei der du `Var1` und `Var2` nutzt um `Var3` zu erklären.
+
+```{r, cache=T}
+
+model = '# measurement model
+         Var1 =~ x1 + x2 + x3
+         Var2 =~ y1 + y2 + y3 + y4
+         Var3 =~ y5 + y6 + y7 + y8
+         # regression
+         Var2 ~ Var1
+         Var3 ~ Var1 + Var2'
+
+fit <- sem(model, data = PoliticalDemocracy)
+summary(fit, standardized = TRUE)
+
+```
+
+
+### e)
+Wir erweitern nun das letzte Modell, um noch eine explizite residuale Korrelationsstruktur.
+Unterstellte hierbei die folgende Korrelationsstruktur zwischen:
+
+  - `y1` und `y5`
+  - `y2` und `y4` und `y6`
+  - `y3` und `y7`
+  - `y4` und `y8`
+  - `y5` und `y8`
+
+
+```{r, cache=T}
+
+model <- '# measurement model
+          ind60 =~ x1 + x2 + x3
+          dem60 =~ y1 + y2 + y3 + y4
+          dem65 =~ y5 + y6 + y7 + y8
+          # regressions
+          dem60 ~ ind60
+          dem65 ~ ind60 + dem60
+          # residual correlations
+          y1 ~~ y5
+          y2 ~~ y4 + y6
+          y3 ~~ y7
+          y4 ~~ y8
+          y6 ~~ y8'
+
+fit2 <- sem(model, data = PoliticalDemocracy)
+summary(fit2, standardized = TRUE)
+
+```
+
+
+### f)
+Vergleiche die Modelle aus d) und e). Wenn du dich für ein Modell entscheiden müsstest, welches würdest du nehmen? 
+Begründe wieso?
+
+```{r, cache=T}
+
+AIC(fit, fit2)
+
+```

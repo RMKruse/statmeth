@@ -1,0 +1,302 @@
+---
+title: "Prior Wählen"
+output: html_document
+date: "2023-08-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(bcogsci)
+library(lme4)
+library(brms)
+library(dplyr)
+```
+
+## Prior Wahl
+
+Nichts ist in der bayesianischen Statistik beunruhigender als der Gedanke, Priors für die Parameter eines Modells festzulegen. 
+Auf den ersten Blick scheint diese Sorge berechtigt zu sein; wie kann man wissen, welche Parameterwerte in einem Modell plausibel sind, bevor man die Daten oder das endgültige Modell überhaupt gesehen hat?
+
+
+## Ein Beispiel
+
+Wir haben hier ein Random-Effects-Modell ohne Korrelation zwischen den Random-Effekten.
+Die Korrelation wird entfernt, um die Posteriorwerte mit den Schätzungen des entsprechenden frequentistischen `lme4`-Modells vergleichen zu können. 
+In dem unten dargestellten Modell verwenden wir "Standard"-Prioritäten, die die `brm`-Funktion für alle Parameter annimmt (wir tun also nichts, das Modell nimmt "nur" Quasi-Gleichverteilungen an).
+Wir verwenden die Standardprioritäten hier nur als Ausgangspunkt; in der Praxis werden wir niemals Standardprioritäten für eine berichtete Analyse verwenden. 
+
+Erst das bayesianische Modell mit Default Prior:
+
+```{r, cache=TRUE, message=FALSE}
+
+data("df_gg05_rc")
+df_gg05_rc <- df_gg05_rc %>%
+  mutate(c_cond = if_else(condition == "objgap", 1 / 2, -1 / 2))
+fit_gg05 <- brm(RT ~ c_cond + (1 + c_cond || subj) +
+                  (1 + c_cond || item), data = df_gg05_rc, cores = 10)
+```
+
+```{r}
+summary(fit_gg05)
+
+```
+
+Die Schätzwerte dieses Modells sind denen eines frequentistischen linearen gemischten Modells bemerkenswert ähnlich:
+
+```{r, cache=TRUE}
+
+fit_lmer <- lmer(RT ~ c_cond + (1 + c_cond || subj) +
+                   (1 + c_cond || item), df_gg05_rc)
+
+summary(fit_lmer)
+
+```
+
+Für den Anfänger in der Bayesianischen Statistik ist es verlockend, den Schluss zu ziehen, dass die in `brms` verwendeten Standard- oder Gleichverteilungsprior ausreichen, um Modelle anzupassen. 
+Wir haben jedoch damals im Kurs diskutiert, wie Prior verwendet werden können, um zusätzliche Informationen durch Expertenwissen in das Modell einzubringen. 
+Aber auch die Standard Prior sind oft zu einfach und führen zu unzuverlässigen Lösungen, weshalb es ratsam ist, gute Prior zu setzen.
+
+WICHTIG! Wir können aus den Daten nicht den perfekten Prior ableiten, aber wir können erkennen, welche Bereiche unsere Prioren abdecken sollten.
+
+
+## Ermitteln eines Priors für den Intercept
+
+Am einfachsten ist es, sich zunächst die Daten von `y` anzusehen und in der Summary zu lesen, die wir erklären wollen.
+Warum die Variable `y`? Nun, der Intercept existiert nicht als Variable im Datensatz und ergibt sich aus unserem `y`, welches bei uns im Beispiel `RT` heißt.
+
+
+```{r, cache=TRUE}
+summary(df_gg05_rc$RT)
+hist(df_gg05_rc$RT)
+```
+
+Das sind wichtige Informationen. 
+
+  1. Was sind die Maximal-/Minimalwerte in den Daten? (Zeigt uns die Grenzen, bis zu denen wir gehen müssen)
+  2. Was ist der Mittelwert der Daten? (Zeigt uns den Mittelwert, den wir beobachten)
+  3. Und was für eine Verteilung haben wir?
+
+
+### Exkurs: Was macht der überhaupt ein Prior?
+
+Was ist die Idee hinter dem Prior?
+
+Nun, die Grundidee ist, dass der Prior den Bereich angibt, in dem du den Schätzer der Größe (Intercept, Slope, Random Effekt, Kovarianz, Sigma, etc.) vermutest.
+Das bedeutet, dass bei einer Normalverteilung der Mean angibt, wo du den Wert ungefähr vermutest und die Standardabweichung gibt quasi an, wie sicher du dir mit der Aussage bist.
+Hingegen Prior wie der von uns an einigen Stellen genutzten Gleichverteilungsprior, hat kein Mean und Standardabweichungswert, sondern obere und untere Grenzen.
+
+Da der Intercept der Schwerpunkt der Daten ist, die wir beobachten, bedeutet das für uns, dass es Sinn macht, einen Prior zu definieren, der zwischen dem minimalen und dem maximalen Wert in den Daten liegt. Wenn du keine weiteren Informationen hast und dich zunächst an den Daten orientieren willst, ist es wahrscheinlich sinnvoll, den Mean des Priors in die Nähe des Datenschwerpunkts zu legen.
+
+In unserem Fall also hier: Min:`r min(df_gg05_rc$RT)`, Max: `r max(df_gg05_rc$RT)`, Mean: `r mean(df_gg05_rc$RT)`.
+
+Wenn wir hier also eine Normalverteilung für den Prior annehmen, macht es Sinn, einen Mittelwert (erste Zahl in der Normalverteilung) um den beobachteten Wert zu setzen (wichtig in der realen Welt, man hat natürlich externes Wissen wie, normalerweise ist der Mean bei 500, was man dann in den Prior einsetzen kann).
+Mit der Standardabweichung / Varianz kannst du ausdrücken wie sicher du dir mit dem Prior Mittelwert bist. Je kleiner der Wert, desto sicherer bist du dir mit dem Wert.
+
+Für eine Gleichverteilung hingegen könnte man für die obere und untere Grenze die Min und Max Werte nutzen für ein möglichst Breites Intervall.
+Bist du dir hingegen sicher und kannst gut den bereich abschätzen in dem das Modell sich bewegen soll, kann du die Grenzen näher aneinander setzten. Diese Distanz steuert quasi die Unsicherheits wie die Standardabweichung in der Normalverteilung/Log-Normalverteilung.
+
+**Also als Beispiel:**
+
+
+Ein Prior mit großem (unsicheren) und kleinem (sicheren) sd, beide mit einem Mittelwert von 100.
+
+```{r, cache=TRUE}
+par(mfrow = c(1, 2))
+hist(rnorm(1000, 100, 300), xlim = c(-1000, 1000), main="Sd von 300")
+hist(rnorm(1000, 100, 10), xlim = c(-1000, 1000), main="SD von 10")
+```
+
+Du kannst sehen, dass je kleiner die Standardabweichung ist, desto mehr Daten liegen genau um den Mittelwert. 
+Auf diese Weise kannst du das Modell "zwingen", so nahe wie möglich am Mittelwert zu liegen.
+Wenn du dir nicht sicher bist, mache die Verteilung breiter, indem du eine höhere Standardabweichung wählst.
+
+
+### Wahl der Standardabweichung für Intercept Prior
+
+
+Aber wie kann ich sehen, wie sicher die Aussage ist?
+
+
+Du hast gerade in den Daten gesehen, dass der Mittelwert der beobachteten Daten irgendwo bei `420` liegt. Es ist also sehr wahrscheinlich, dass der Schätzer irgendwo in diesem Bereich liegt.
+Nun schau dir die Daten noch einmal an und plotte sie 
+
+```{r}
+plot(df_gg05_rc$RT)
+```
+
+Und du siehst, dass die meisten Daten in diesem Beispiel sehr nahe am Mittelwert liegen, abgesehen von ein paar Ausreißern hinten.
+Das bedeutet, dass du ziemlich sicher sein kannst, dass der Intercept wirklich irgendwo um 420 liegt. 
+Du kannst also theoretisch die Standardabweichung kleiner machen.
+Jetzt kannst du z.B. wieder Histogramme mit den verschiedenen Prioritäten zeichnen:
+
+```{r, cache=TRUE}
+hist(rnorm(1000, 420, 200), xlim = c(-1000, 1000), main="Mean 420, Sd von 200")
+hist(rnorm(1000, 420, 50), xlim = c(-1000, 1000), main="Mean 420, Sd von 50")
+```
+
+Und entscheiden, welcher von beiden macht mehr Sinn, gegebgen der min/max Werte und deiner Annahmen.
+
+
+Und entscheide, welcher von beiden unter Berücksichtigung der Min/Max-Werte und deiner Annahmen am sinnvollsten ist.
+
+Oder du kannst dir die Werte einfach numerisch ausgeben lassen. 
+Es gibt die Möglichkeit zu berechnen, welche Werte abgedeckt werden. 
+Hier seht ihr, wofür die Befehle qnorm und rnorm gut sind. Ihr müsst sie aber nicht benutzen!
+
+```{r, cache=TRUE}
+summary(rnorm(1000, 420, 200))
+summary(rnorm(1000, 420, 50))
+
+# Alternativ
+qnorm(c(0.025, 0.975), 420, 200) # Also beidseitig, 95% der Daten sind in diesem Bereich
+qnorm(c(0.025, 0.975), 420, 50) # Also beidseitig, 95% der Daten sind in diesem Bereich
+```
+
+### Zusammenfassend
+
+Wenn du einen guten ersten Prior haben willst (was auch in der Prüfung eine Rolle spielt), dann ist es sinnvoll, sich zuerst die Daten anzuschauen, was das "y" für den Intercept ist.
+Die Verteilung, z.B. Normalverteilung definiert den Raum in dem du den Intercept vermutest. Der Mean sagt, wo du ihn am ehesten vermutest und die Standardabweichung zeigt, wie sicher du dir mit dieser Aussage bist.
+
+In der Prüfung musst du deine Wahl begründen. Du würdest dann sagen, dass der Mean z.B. bei `420` liegt, weil ich vermute, dass der Intercept nahe am Mittelwert liegt. 
+
+--- 
+
+## Ermitteln eines Priors für den Slope Parameter
+
+Die Vorgehensweise bei der Analyse der Daten ist die gleiche wie beim Intercept, mit dem Vorteil, dass wir die Variable im Datensatz haben, für die wir den Prior finden wollen!
+
+Auch hier stellt sich die Frage: "Was glaube ich, wie der Effekt des Steigungsparameters aussieht?" und "Wie sicher bin ich mir in meiner Aussage?".
+
+Der Ablauf ist ähnlich wie vorher, wir plotten die Daten oder schauen uns die Summary an.
+
+### Wahl des Priors
+
+Im ersten Schritt empfehle ich einfach die Daten wieder zu plotten über ein Histogram. Daran kannst du erkennen was für eine Verteilung vielleicht Sinn ergibt.
+Eine einfache Regel ist hier, wenn das Modell normalverteilt ist, dann macht es oft Sinn auch die Variablen normalverteilt zu machen.
+
+### Beispiel und Kleiner Trick
+
+Der einfachste Weg, den Prior für ein Slope zu konstruieren, besteht darin, ein einfaches NICHT-Bayesianisches Modell zu konstruieren.
+Nehmen wir z.B. den `df_pupil` Datensatz, den wir behandelt haben.
+
+```{r}
+data("df_pupil")
+(df_pupil <- df_pupil %>%
+  mutate(c_load = load - mean(load)))
+
+summary(df_pupil)
+```
+
+Wir wollen jetzt das folgende Modell bauen:
+```R
+p_size ~ 1 + c_load
+```
+Aber wie definieren wir nun die Prior?
+Für den Intercept habe ich es schon beschrieben, für den Slope zeige ich es hier:
+
+Histogramme und Summary c_load nutzen. 
+
+```{r}
+hist(df_pupil$c_load, breaks = 3)
+summary(df_pupil$c_load)
+```
+
+Die Variable scheint in gewisser Weise normalverteilt zu sein.
+Es macht also Sinn, eine Normalverteilung anzunehmen.
+Aber wie bestimmen wir den Mittelwert und die Varianz/Standardabweichung? 
+
+--> Kleiner Trick: lineares Modell
+
+Wir bauen einfach ein "normales" statistisches Modell und schauen, was dabei herauskommt!
+
+```{r, cache=TRUE}
+trick <- lm(p_size ~ 1 + c_load, data=df_pupil)
+summary(trick)
+```
+
+Wir können diese Werte gut als Startpunkte für unser Bayesiansiches Modell nutzen, also wäre der Prior in diesem Fall Normalverteilt mit einem mean von ungefähr 700 und einer Standardabweichung von ungefähr 20. Das schöne hierbei ist, wir können unsere Prior nach unserem Verständnis anpassen! Dieser Trick gilt natürlich auch für die beiden anderen Größen (Interceot und Sigma) machen. Für hierachische Modelle nutzt man statt `lm()` den `lmer()`-befehl aus dem `lme4`-package.
+
+Beispiel für hierachisches Modell mit einem Random Intercept:
+
+```R
+library(lme4)
+lmm_trick <- lmer(p_size ~ 1 + c_load + (1 | trial  ), data= df_pupil)
+```
+
+**! Aber Vorsicht !** Die Werte aus den normalen Statistischen Modellen funktionieren nur für Normalverteilung oder die Log-Normalverteilung (wenn logarithmiert).
+Andere Verteilungen wie Gleich-, Beta- oder Gammaverteilungen funktionieren damit nicht!.
+
+## Ermitteln eines Priors für das Sigma/Varianz 
+
+Nachdem wir die Priors für den Intercept und die Steigung definiert haben, müssen wir noch die Priors für die Parameter der Varianzkomponenten definieren. 
+Zumindest in der Psychologie und der Spieltheorie ist die Standardabweichung der Residuen in der Regel die größte Varianzquelle; 
+Die Standardabweichung der Achsenabschnitte nach Probanden ist in der Regel der nächstgrößere Wert, und wenn die experimentellen Items so konzipiert sind, dass sie eine minimale Varianz aufweisen, sind dies in der Regel die kleinsten Komponenten. 
+Auch hier können wir uns einige frühere Daten ansehen, um ein Gefühl für die Prioritäten zu bekommen.
+
+Wir könnten z.B. Varianzkomponentenschätzungen aus vorhandenen Studien verwenden, aber leider haben wir so etwas nicht in der Prüfung ;).
+
+### Wahl des Priors
+
+Die Wahl des Priors für Sigma ist am einfachsten, da wir nur die Standardabweichung in den Daten betrachten müssen und sehen, wie stark die Daten selbst streuen.
+Und in den meisten Modellen, und allen die wir betrachtet haben, hat der Mean des Sigma Priors IMMER den Wert 0, wir müssen also nur die Standardabweichung bestimmen.
+
+Am Beispiel des letzten Abschhnitts:
+
+```{r, cache = T}
+
+sd(df_pupil$c_load)
+
+```
+
+Die 
+
+Alternativ natürlich der gleiche Trick wie bei den anderen Parametern! Nicht-Bayesianisches Modell als Ausgangspunkt wählen
+
+```R
+Call:
+lm(formula = p_size ~ 1 + c_load, data = df_pupil)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-216.07  -80.49  -14.68   46.95  335.41 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   701.06      19.43  36.072  < 2e-16 ***
+c_load         34.31      11.55   2.971  0.00506 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 124.4 on 39 degrees of freedom
+Multiple R-squared:  0.1846,	Adjusted R-squared:  0.1636 
+F-statistic: 8.827 on 1 and 39 DF,  p-value: 0.005062
+```
+
+Hier könnt ihr im Abschnitt `Residual standard error: 124.4` ablesen was die Residual Varianz des Modells ist, es stellte eine gute Alternativ dar zu dem `sd()`-befehl mit `r sd(df_pupil$c_load)`.
+
+Wenn wir uns jetzt das bayesiansiche Modell aus den Einsichten aus den vorigen Abschnitten bauen führt es zu folgendem:
+
+```{r, cache=TRUE}
+
+bayes_model <- brm( p_size ~ 1 + c_load, 
+                    data = df_pupil,
+                    family = gaussian(),
+                    prior = c(
+                      prior(normal(700, 20), class = Intercept),
+                      prior(normal(35, 12), class = b),
+                      prior(normal(0, 125), class = sigma)
+                    ),
+                    cores = 10)
+summary(bayes_model)
+
+```
+
+Und wir sehen dieser Trick erlaubt es uns gute geeinete (erste) Prior zu finden.
+
+---
+
+## Hinweis
+
+In der echten Welt, habt ihr natürlich Paper gelesen, Supervisor oder andere Quellen die euch gute Einsicht in die Daten erlauben.
+Diese Erfahrungen könnt ihr gut nutzen um die Prior weiteranzupassen. 
+Solltet ihr aber in der Situation sein wie in der Klausur, wo ihr keine Ahnung von den Daten habt, sind diese Methoden und vor allem der "ich bau einfach ein frequentistisches Startmodell" Trick mehr als gelegen. Vor allem dieser kleine Trick, wird eigentlich von allen in der "echten" Welt gemacht weil es einfach ein sehr einfacher und verlässlicher Teil der ersten Analyse ist.

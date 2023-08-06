@@ -1,0 +1,319 @@
+---
+title: "Übungsklausur"
+output: 
+  html_document: default
+  pdf_document: default
+---
+
+
+
+## Matrikel-Nr.: (Bitte eintragen!) 
+
+## Platz: (Bitte eintragen!)
+
+---
+
+#### Bitte beachten:
+
+-   Alle Lösungen sind IN das Rmarkdown File zu schreiben.
+
+-   Lese genau, wonach gefragt wird und wie die Lösung anzugeben ist.
+
+-   Für jede Aufgabe ist die maximal zu erreichende Punktzahl gegeben.
+
+
+#### Zugelassene Hilfsmittel:
+
+-   Ein (auch beidseitig) handschriftlich beschriebenes DIN A4-Blatt.
+
+#### Anzahl der anzugebenden Lösungen
+
+  - Gebe niemals mehrere Lösungsalternativen an. Es wird sonst die erste Antwort genommen.
+
+---
+
+## Anzahl der Aufgaben: 3 (in echter Klausur 4)
+
+## Gesamtpunktzahl: 50
+
+---
+
+
+# Aufgabe 1 (12 Punkte):
+
+Im folgenden werden Aussagen getroffen welche entweder WAHR oder FALSCH sind.
+Bewerte jede Aussage, treffe eine Entscheidung ob diese WAHR oder FALSCH ist.
+Wenn die Aussage FALSCH ist, bitte begründe warum.
+
+Jede richtig beantwortete Aufgabe gibt 2 Punkte.
+
+*Beispiel:*
+Wahr oder Falsch?
+
+Im Model $y_1 = \alpha + \gamma x_1 + \zeta_1$ $y_1$ steht dafür, dass es nur eine Beobachtung gibt. \newline
+
+**Antwort:** Falsch. Die $1$ in dem Modell steht jeweils für die erste Variable $y$. Wir können in SEM Modellen mehrere $y$-Variablen haben.
+
+---
+
+(a) Der Satz von Bayes berechnet die Wahrscheinlichkeit davon, dass zwei Ereignisse $A$ und $B$ gleichzeitig auftreten. (2 Punkte) 
+
+**Antwort:** Falsch. Der Satz von Bayes berechnet bedingte Wahrscheinlichkeiten, also der Wahrscheinlichkeit dass z.B. A eintritt, wenn B bereits eingetreten ist.
+
+(b) Du machst zwei Würfelwürfe (Ereignisse $A$ und $B$). Beim ersten Wurf $A$ sind sechs Augen zu sehen, nun ist die marginale Wahrscheinlichkeit für sechs Augen beim zweiten Wurf $1/36$. (2 Punkte)
+
+**Antwort:** Falsch. Marginale Wahrscheinlichkeiten sind unabhängig von anderen Ergebnissen. Die Marginale Wahrscheinlichkeit für den zweiten Wurf, ist also nur die Wahrscheinlichkeit von von zweiten alleine also $1/6$.
+
+(c) Wahrscheinlichkeiten können nur Werte zwischen $0$ und $1$ annehmen. (2 Punkte)
+
+**Antwort:** Wahr.
+
+(d) Es gibt keine Unterschiede in den Ergebnissen von Kleinst-Quadrate und Maximum-Likelihood Schätzung eines Modells. (2 Punkte)
+
+**Antwort:** Falsch. Die Schätzer der Varianz vom KQ und ML Ansatz unterscheiden sich.
+
+(e) Bei bayesianischen Modellen wollen wir die Posterior Verteilung berechnen. (2 Punkte)
+
+**Antwort:** Wahr. 
+
+(f) Strukturgleichungsmodelle sind speziell, denn sie erlauben es als einziges Modellframework Regression durchzuführen. (2 Punkte)
+
+**Antwort:** Falsch. Auch Lineare Regressionsmodelle oder bayesianische Modelle erlauben ebenfalls eine Regression.
+
+--- 
+
+# Aufgabe 2: Bayesianisches Modell (20 Punkte)
+
+*Setup:*
+```{r, cache=TRUE}
+library(brms)
+set.seed(42)
+```
+
+(a) 
+Lese die gegeben Daten `datensatz1.rda`in R ein. (1 Punkt)
+
+```{r, cache=TRUE}
+# Erste Möglichkeit
+library(readr)
+datensatz1 <- read_csv("datensatz1.csv")
+
+# Zweite Möglichkeit
+datensatz1 <- read.csv("datensatz1.csv")
+```
+
+*Hinweis:* Wie bei vielem in R gibt es verschiedene Lösungsmöglichkeiten. 
+
+
+(b)
+Schaue dir die zu erklärende Variable `y` an. 
+Welche Verteilung folgt diese? 
+Was bedeutet es für ein bayesianisches Modell? (2 Punkte)
+
+```{r, cache=TRUE}
+summary(datensatz1$y)
+hist(datensatz1$y)
+
+```
+
+**Antwort:** Die Variablen `y` scheint einer Normalverteilung zu folgen, auch wenn dies natürlich nicht perfekt aussieht. Aber wir haben ja nur 41 Beobachtungen, also weit weg von "optimalen" Umständen. Es macht Sinn eine Normalverteilung für die "Family" der Daten in einem Bayesianischen Modell zu unterstellen.
+
+(c)
+Gegeben der Daten baue ein einfaches bayesianisches Modell, welche die Variablen `x1`, `x2` und einen Intercept nutzt um `y` zu erklären.
+Hierbei nimm an, dass du kein eigenes Wissen über die Daten hast. Wie würdest du die Prior auswählen? Begründe deine Entscheidungen. (8 Punkte)
+
+```{r, cache=TRUE}
+summary(datensatz1)
+# Verteilung der Variablen X1 und X2
+par(mfrow=c(1,2)) 
+hist(datensatz1$x1); hist(datensatz1$x2)
+
+```
+
+
+
+```{r, cache=TRUE}
+# Das Modell:
+model_c <- brm(y ~ 1 + x1 + x2,
+                 data = datensatz1,
+                 family = gaussian(),
+                 prior = c(
+                   prior(normal(675, 150), class = Intercept),
+                   prior(normal(0, 150), class = sigma),
+                   prior(normal(2.5, 1.8),  class = b, coef = x1),
+                   prior(normal(125, 200), class = b, coef = x2)
+                 ),
+               cores = 10,
+               control = list(adapt_delta = 0.9),    
+               save_pars = save_pars(all = TRUE)
+            )
+summary(model_c)
+
+```
+
+**Antwort:**
+
+  - Intercept: Ist der Schwerpunkt (Mittelwert) der Daten, welcher bei 675 liegt. Die Std. davon stellt einfach unsere Unsicherheit dar.
+  - sigma : Ist die Modellstd. welche wir aus den Daten approximieren können über `sd()`, welche bei 150 liegt. Der Mittelwert von sigma liegt per Modell Annahmen immer bei 0. 
+  - x1 : Scheint mehr oder minder gleichverteilt zu sein (alternativ könnte man hier auch Mittelwert zentrieren was die Form auch verändert). Unteregrenze liegt bei 0 und obere bei 5.
+
+(d)
+Ist das Modell konvergiert? Begründe.
+
+```{r,cache=TRUE}
+plot(model_c)
+```
+
+**Antwort:** 
+Am Plot kann man sehen, dass die Graphen (rechts) übereinander liegen spricht es dafür, dass das Modell "fertig" konvergiert sind.
+Alternativ kann man es an der `summary()` erkennen, so wie es am Ende steht mit 
+`Rhat is the potential ## scale reduction factor on split chains (at convergence, Rhat = 1).` Also Rhat = 1 es ist konvergiert, was man auch hier erkennen kann.
+
+(e) 
+Nach betrachten der Daten behauptet einer deiner Kommilitonen, dass die Variable `x2` keinerlei Einfluss auf `y` haben sollte.
+Untersuche ob Variable `x2` ein Platz im Modell haben sollte oder nicht. Begründe. (4 Punkte)
+
+```{r, cache=TRUE}
+model_e <- brm(y ~ 1 + x1,
+                 data = datensatz1,
+                 family = gaussian(),
+                 prior = c(
+                   prior(normal(675, 150), class = Intercept),
+                   prior(normal(0, 150), class = sigma),
+                   prior(normal(2.5, 1.8),  class = b, coef = x1)
+                 ),
+               cores = 10,
+               control = list(adapt_delta = 0.9),    
+               save_pars = save_pars(all = TRUE)
+            )
+
+```
+
+```{r, cache=TRUE}
+# Bayes Faktor
+margLogLik_m1 <- bridge_sampler(model_c, silent = TRUE)
+margLogLik_m2 <- bridge_sampler(model_e, silent = TRUE)
+(BF_ln <- bayes_factor(margLogLik_m1, margLogLik_m2))
+WAIC(model_c, model_e)
+```
+
+**Antwort:** Wir können erkennen, dass das zweite Modell um `0.1` Punkte schlechter ist. Also eine absolute minimale Verschlechterung. 
+Jetzt kann man streng argumentieren, dass das schlechter ist und somit das erste Modell besser ist . 
+Man kann aber auch argumentieren, dass durch das weglassen von einer ganzen Variablen der Wert sich um einen absolut geringen Wert von `0.1` verschlechtert. 
+Es könnte man auch so interepretieren, dass somit die die Variable nicht wichtig ist. Beides verständliche Argumentationen. 
+(In einer Klausur kommt es auf DEINE Interpretation an!)
+
+(f)
+Interpretiere die Ergebnisse für die Schätzer der Parameter des Modells was du in (d) ausgewählt hast. (3 Punkte)
+
+```{r, cache=TRUE}
+# Sagen wir mal, dass das erste Modell besser ist
+summary(model_c)
+```
+
+**Antwort:**
+
+  - Der Intercept, also der Wert wenn alle anderen Variablen Null wären, dann hätten wir im Durchschnitt einen Effekt (Wert) von `660.15` mit einem Schätzfehler (Estimation Error) von `27.32`.
+  - Der Effekt von `x1`, also wenn `x1` um eine Einheit ansteigt, steigt der Wert von `y` im Mittel wenn alles andere konstant bleibt (c.p.) um `2.88` mit einem Schätzfehler von `1.76`.
+  - Der Effekt von `x2`, also wenn `x2` um eine Einheit ansteigt, steigt der Wert von `y` im Mittel wenn alles andere konstant bleibt (c.p.) um `0.07` mit einem Schätzfehler von `0.11`.
+  - Die geschätzte Modellvarianz beträgt `151.37` mit einem Schätzfehler von `17.64`.
+
+---
+
+# Aufgabe 3: Strukturgleichungsmodelle (18 Punkte)
+
+```{r, cache=TRUE}
+library(lavaan)
+```
+
+(a) 
+Lese den Datensatz `datensatz2.csv` ein. 
+(1 Punkt)
+
+```{r, cache=TRUE}
+# Erste Möglichkeit
+library(readr)
+datensatz2 <- read_csv("datensatz2.csv")
+
+# Zweite Möglichkeit
+datensatz2 <- read.csv("datensatz2.csv")
+```
+
+(b)
+Wir bauen ein Measurement Modell, welche erst einmal aus den erklärenden Variablen $x_1, x_2, x_3, x_4, x_5$ eine neue latente Größe $\xi_1$ erstellt.
+Darüberhinaus erstellen wir eine weitere latente Variable $\xi_2$ aus $x_5, x_6$.
+Erst einmal nehmen wir keine speziellen Annahmen an über die Covarianz/Correlationen. 
+(4 Punkte)
+
+```{r, cache=TRUE}
+
+m_gleichung <- '# measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7'
+m_b <- sem(m_gleichung, data=datensatz2)
+
+
+```
+
+
+
+(c)
+Nutze die beiden erstellten latenten Variablen aus (b) um das unterstellte `y` zu erklären.
+Kommt das selbe Ergebnis dabei raus, wenn du statt den latenten Varialben direkt $x_1, x_2, x_3, x_4, x_5, x_6, x_7$ nutzt ? Begründe.
+(4 Punkte)
+
+```{r, cache=TRUE}
+m_gleichung <- '#regression
+                y ~ f1+ f2
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7' 
+m_c <- sem(m_gleichung, data=datensatz2)
+
+```
+
+**Antwort:** Nein, es wird nicht das gleiche Modell (Ergebnis) dabei herauskommen, da das Measurement Modell eine Form der Faktoranalyse macht, und die X Variablen nicht zu 100 genutzt werden. Beispiel: Wenn wir das reine $x$ Model bauen, und annahmen dass beide Modelle gleich sind, dann müssten beide Modelle die selben Werte z.B. AIC aufweisen. Wie hier zu sehen ist dem nicht so (auch wenn das mOdell nicht fertig konvergiert ... nun.)
+
+```{r, cache=TRUE}
+m_gleichung <- '#regression
+                y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7' 
+m_c2 <- sem(m_gleichung, data=datensatz2)
+AIC(m_c, m_c2)
+```
+
+
+(d) 
+Erstelle das selbe Modell noch einmal, nur unterstelle jetzt, dass es eine implizite Covarianz/Correlation zwischen $x_4$ und $x_6$ gibt.
+Baue diese in das neue Modell ein. Vergleiche das Model aus (c) und aus (d), welches dieser Modelle schätzt du als besser geeignet ein?
+(9 Punkte)
+
+```{r, cache=TRUE}
+m_gleichung <- '#structural
+                y ~ f1+ f2
+                #measurement
+                f1 =~ x1 + x2 + x3 + x4 + x5 
+                f2 =~ x6 + x7
+                #correlation
+                x6 ~~ x4
+                '
+m_d <- sem(m_gleichung, datensatz2)
+```
+
+
+```{r, cache=TRUE}
+summary(m_c, fit.measures = TRUE)
+summary(m_d, fit.measures = TRUE)
+
+```
+
+**Antwort:**
+
+  - Informationskriterien: Model (c) besser
+  - RMSEA : Model (d) besser
+  - SRMR: Model (c) besser
+  - CFI/TLI : Model (d) besser
+
+Entscheidung: Wir können hier kein eindeutiges Ergebnis erkennen. Es kommt hierbei ganz klar auf eure Argumentation an. Ich persönlich würde mich für das Model aus c entscheiden, da hier ganze drei Informationskriterien für dieses Modell sprechen. Allerdings wäre eine Argumentation genauso richtig zu sagen, dass ein geringerer Fehler für ein besseres Modell sprich, was basierent auf dem RMSEA für das MOdel aus (d) spricht.
