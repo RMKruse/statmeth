@@ -1,0 +1,221 @@
+---
+title: "Übungsklausur"
+output: 
+  html_document: default
+  pdf_document: default
+---
+
+
+
+## Matrikel-Nr.: (Bitte eintragen!) 
+
+## Platz: (Bitte eintragen!)
+
+---
+
+#### Bitte beachten:
+
+-   Alle Lösungen sind IN das Rmarkdown File zu schreiben.
+
+-   Lese genau, wonach gefragt wird und wie die Lösung anzugeben ist.
+
+-   Für jede Aufgabe ist die maximal zu erreichende Punktzahl gegeben.
+
+
+#### Zugelassene Hilfsmittel:
+
+-   Ein (auch beidseitig) handschriftlich beschriebenes DIN A4-Blatt.
+
+#### Anzahl der anzugebenden Lösungen
+
+  - Gebe niemals mehrere Lösungsalternativen an. Es wird sonst die erste Antwort genommen.
+
+---
+
+## Anzahl der Aufgaben: 3 (in echter Klausur 4)
+
+## Gesamtpunktzahl: 50
+
+---
+
+
+# Aufgabe 1 (12 Punkte):
+
+Im folgenden werden Aussagen getroffen welche entweder WAHR oder FALSCH sind.
+Bewerte jede Aussage, treffe eine Entscheidung ob diese WAHR oder FALSCH ist.
+Wenn die Aussage FALSCH ist, bitte begründe warum.
+
+Jede richtig beantwortete Aufgabe gibt 2 Punkte.
+
+*Beispiel:*
+Wahr oder Falsch?
+
+Im Model $y_1 = \alpha + \gamma x_1 + \zeta_1$ $y_1$ steht dafür, dass es nur eine Beobachtung gibt. \newline
+
+**Antwort:** Falsch. Die $1$ in dem Modell steht jeweils für die erste Variable $y$. Wir können in SEM Modellen mehrere $y$-Variablen haben.
+
+---
+
+(a) Der Satz von Bayes berechnet die Wahrscheinlichkeit davon, dass zwei Ereignisse $A$ und $B$ gleichzeitig auftreten. (2 Punkte) 
+
+**Antwort:** 
+
+(b) Du machst zwei Würfelwürfe (Ereignisse $A$ und $B$). Beim ersten Wurf $A$ sind sechs Augen zu sehen, nun ist die marginale Wahrscheinlichkeit für sechs Augen beim zweiten Wurf $1/36$. (2 Punkte)
+
+**Antwort:** 
+
+(c) Wahrscheinlichkeiten können nur Werte zwischen $0$ und $1$ annehmen. (2 Punkte)
+
+**Antwort:** 
+
+(d) Es gibt keine Unterschiede in den Ergebnissen von Kleinst-Quadrate und Maximum-Likelihood Schätzung eines Modells. (2 Punkte)
+
+**Antwort:** 
+
+(e) Bei bayesianischen Modellen wollen wir die Posterior Verteilung berechnen. (2 Punkte)
+
+**Antwort:** 
+
+(f) Strukturgleichungsmodelle sind speziell, denn sie erlauben es als einziges Modellframework Regression durchzuführen. (2 Punkte)
+
+**Antwort:** 
+
+--- 
+
+# Aufgabe 2: Bayesianisches Modell (20 Punkte)
+
+*Setup:*
+```{r, cache=TRUE}
+
+```
+
+(a) 
+Lese die gegeben Daten `datensatz1.rda`in R ein. (1 Punkt)
+
+```{r, cache=TRUE}
+
+```
+
+
+
+(b)
+Schaue dir die zu erklärende Variable `y` an. 
+Welche Verteilung folgt diese? 
+Was bedeutet es für ein bayesianisches Modell? (2 Punkte)
+
+```{r, cache=TRUE}
+
+
+```
+
+**Antwort:** 
+
+
+(c)
+Gegeben der Daten baue ein einfaches bayesianisches Modell, welche die Variablen `x1`, `x2` und einen Intercept nutzt um `y` zu erklären.
+Hierbei nimm an, dass du kein eigenes Wissen über die Daten hast. Wie würdest du die Prior auswählen? Begründe deine Entscheidungen. (8 Punkte)
+
+```{r, cache=TRUE}
+
+
+```
+
+
+**Antwort:**
+
+
+(d)
+Ist das Modell konvergiert? Begründe.
+
+```{r,cache=TRUE}
+
+
+```
+
+**Antwort:** 
+
+
+(e) 
+Nach betrachten der Daten behauptet einer deiner Kommilitonen, dass die Variable `x2` keinerlei Einfluss auf `y` haben sollte.
+Untersuche ob Variable `x2` ein Platz im Modell haben sollte oder nicht. Begründe. (4 Punkte)
+
+```{r, cache=TRUE}
+
+
+```
+
+
+**Antwort:** 
+
+(f)
+Interpretiere die Ergebnisse für die Schätzer der Parameter des Modells was du in (d) ausgewählt hast. (3 Punkte)
+
+```{r, cache=TRUE}
+
+```
+
+**Antwort:**
+
+
+---
+
+# Aufgabe 3: Strukturgleichungsmodelle (18 Punkte)
+
+*Setup:*
+
+```{r, cache=TRUE}
+
+```
+
+(a) 
+Lese den Datensatz `datensatz2.csv` ein. 
+(1 Punkt)
+
+```{r, cache=TRUE}
+
+```
+
+(b)
+Wir bauen ein Measurement Modell, welche erst einmal aus den erklärenden Variablen $x_1, x_2, x_3, x_4, x_5$ eine neue latente Größe $\xi_1$ erstellt.
+Darüberhinaus erstellen wir eine weitere latente Variable $\xi_2$ aus $x_5, x_6$.
+Erst einmal nehmen wir keine speziellen Annahmen an über die Covarianz/Correlationen. 
+(4 Punkte)
+
+```{r, cache=TRUE}
+
+
+
+```
+
+
+
+(c)
+Nutze die beiden erstellten latenten Variablen aus (b) um das unterstellte `y` zu erklären.
+Kommt das selbe Ergebnis dabei raus, wenn du statt den latenten Varialben direkt $x_1, x_2, x_3, x_4, x_5, x_6, x_7$ nutzt ? Begründe.
+(4 Punkte)
+
+```{r, cache=TRUE}
+
+
+```
+
+**Antwort:** 
+
+```{r, cache=TRUE}
+
+```
+
+
+(d) 
+Erstelle das selbe Modell noch einmal, nur unterstelle jetzt, dass es eine implizite Covarianz/Correlation zwischen $x_4$ und $x_6$ gibt.
+Baue diese in das neue Modell ein. Vergleiche das Model aus (c) und aus (d), welches dieser Modelle schätzt du als besser geeignet ein?
+(9 Punkte)
+
+```{r, cache=TRUE}
+
+```
+
+
+
+**Antwort:**
+

@@ -1,0 +1,22 @@
+Benötigte R Packages (keine bestimmten Versionsnummer, einfach aktuelle CRAN)
+(getested: Fedora Linux 38 (Workstation Edition) x86_64, 6.4.4-200.fc38.x86_64, 25.07.2023)
+
+# Von CRAN, inkl. Dependencies
+rstan
+dplyr
+purr
+tidyr
+extraDistr
+brms
+hypr
+lme4
+lavaan
+
+# Von Github
+bcogsci
+
+# installations befehle
+install.packages(c("rstan", "dplyr", "purrr", "tidyr", "extraDistr", "brms", "hypr", "lme4","lavaan"))
+
+remotes::install_github("bnicenboim/bcogsci")
+

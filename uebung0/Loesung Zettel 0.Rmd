@@ -144,8 +144,27 @@ pnorm(800, mean=800, sd=150, lower.tail = FALSE)
 ```
 
 
+---
 
+### Aufgabe 3
+```{r}
 
+datagen1 <- rnorm(1000, 300, 200)
+
+```
+
+Berechne den Mittelwert, die Varianz und das untere Quantil q1 und das obere Quantil q2, die
+̈aquidistant sind und bei denen die Wahrscheinlichkeitsspanne zwischen ihnen 80% beträgt.
+
+```{r}
+# Mittelwert (arithmetisches Mittel, engl. Mean)
+mean(datagen1)
+# Varianz
+var(datagen1)
+# Quantile
+quantile(datagen1, c(0.1, 0.9))
+```
+*Hinweis:* Es gibt hier wieder mehrere Lösungsmöglichkeiten. Vor allem bei den Quantilen. Wir sagen hier nur, dass die Quantile gleich entfernt sein müssen und dass zwischen den beiden betrachteten 80% der Daten liegen müssen.
 
 
 
