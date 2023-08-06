@@ -214,7 +214,7 @@ trick <- lm(p_size ~ 1 + c_load, data=df_pupil)
 summary(trick)
 ```
 
-Wir können diese Werte gut als Startpunkte für unser Bayesiansiches Modell nutzen, also wäre der Prior in diesem Fall Normalverteilt mit einem mean von ungefähr 700 und einer Standardabweichung von ungefähr 20. Das schöne hierbei ist, wir können unsere Prior nach unserem Verständnis anpassen! Dieser Trick gilt natürlich auch für die beiden anderen Größen (Interceot und Sigma) machen. Für hierachische Modelle nutzt man statt `lm()` den `lmer()`-befehl aus dem `lme4`-package.
+Wir können diese Werte gut als Startpunkte für unser Bayesiansiches Modell nutzen, also wäre der Prior in diesem Fall Normalverteilt mit einem mean von ungefähr 34.31 und einer Standardabweichung von ungefähr 11.55 Das schöne hierbei ist, wir können unsere Prior nach unserem Verständnis anpassen! Dieser Trick gilt natürlich auch für die beiden anderen Größen (Interceot und Sigma) machen. Für hierachische Modelle nutzt man statt `lm()` den `lmer()`-befehl aus dem `lme4`-package.
 
 Beispiel für hierachisches Modell mit einem Random Intercept:
 

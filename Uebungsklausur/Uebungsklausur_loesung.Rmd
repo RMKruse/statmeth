@@ -127,7 +127,8 @@ summary(datensatz1)
 # Verteilung der Variablen X1 und X2
 par(mfrow=c(1,2)) 
 hist(datensatz1$x1); hist(datensatz1$x2)
-
+summary(lm(y ~ 1 + x1 + x2,
+                 data = datensatz1))
 ```
 
 
@@ -141,7 +142,7 @@ model_c <- brm(y ~ 1 + x1 + x2,
                    prior(normal(675, 150), class = Intercept),
                    prior(normal(0, 150), class = sigma),
                    prior(normal(2.5, 1.8),  class = b, coef = x1),
-                   prior(normal(125, 200), class = b, coef = x2)
+                   prior(normal(0, 0.12), class = b, coef = x2)
                  ),
                cores = 10,
                control = list(adapt_delta = 0.9),    
